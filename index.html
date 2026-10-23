@@ -388,7 +388,7 @@
 </dialog>
 
 <!-- Bump ?v= whenever words-info.js changes, so browsers fetch the new descriptions instead of a cached copy. -->
-<script src="words-info.js?v=7"></script>
+<script src="words-info.js?v=9"></script>
 <script>
 (() => {
   const SIZE = 10;
@@ -541,6 +541,37 @@
              "JURASSIC", "LIZARD", "MEI", "MESOZOIC", "MINMI", "MOSASAUR", "MUSEUM", "NEST", "PANGAEA",
              "PLATES", "PTEROSAUR", "RAPTOR", "ROAR", "SAUROPOD", "SCALES", "SPIKES", "SUE", "TAIL",
              "TAWA", "THEROPOD", "TOOTH", "TRACKS", "TREX", "TRIASSIC", "TROODON", "ZUUL"],
+    "Theme-Park Rides": ["AIRTIME", "ARCADE", "CABLECAR", "CANDYFLOSS", "CAROUSEL", "CLIMB", "COASTER", "CORKSCREW",
+             "DODGEMS", "DROP", "DROPTOWER", "FAIR", "FERRIS", "FIREWORKS", "FUNHOUSE", "GATE",
+             "GFORCE", "GHOSTTRAIN", "HARNESS", "HEIGHT", "INVERSION", "KART", "LAUNCH", "LAZYRIVER",
+             "LIFTHILL", "LOGFLUME", "LOOP", "MAP", "MASCOT", "MAZE", "MONORAIL", "PARADE", "PIER",
+             "POPCORN", "PRIZE", "QUEUE", "RAPIDS", "RIDE", "SCREAM", "SLIDE", "SPIN", "SPLASH",
+             "SWINGBOAT", "SWINGS", "TEACUPS", "THRILL", "TICKET", "TOWER", "TRAIN", "TWIST",
+             "WATERSLIDE", "WAVE", "WHIRL", "ZIPLINE"],
+    "Retro Gaming": ["ARCADE", "ASTEROIDS", "ATARI", "BOSS", "CARTRIDGE", "CENTIPEDE", "CHEATCODE", "CHIPTUNE",
+             "COIN", "CONSOLE", "CONTINUE", "DONKEYKONG", "DOOM", "DPAD", "EIGHTBIT", "FROGGER",
+             "GALAGA", "GAMEBOY", "GAMEOVER", "HIGHSCORE", "INVADERS", "JOYPAD", "JOYSTICK", "KIRBY",
+             "KONAMI", "LEVEL", "LINK", "LIVES", "MARIO", "MEGAMAN", "METROID", "MYST", "NES",
+             "NINTENDO", "PACMAN", "PADDLE", "PIXEL", "PONG", "POWERUP", "SEGA", "SNES", "SONIC",
+             "SPRITE", "TAMAGOTCHI", "TETRIS", "YOSHI", "ZELDA"],
+    "Pokémon": ["ABRA", "ARCANINE", "ASH", "BADGE", "BATTLE", "BROCK", "BULBASAUR", "CATCH", "CHARMANDER",
+             "DITTO", "DRAGONITE", "EEVEE", "EVOLVE", "GENGAR", "GRENINJA", "GROWLITHE", "GYARADOS",
+             "GYM", "JIGGLYPUFF", "JOHTO", "KANTO", "LAPRAS", "LEGENDARY", "LUCARIO", "MACHOP",
+             "MAGIKARP", "MEW", "MEWTWO", "MISTY", "OAK", "ONIX", "PIKACHU", "POKEBALL", "POKEDEX",
+             "PONYTA", "PSYDUCK", "SHINY", "SLOWPOKE", "SNORLAX", "SQUIRTLE", "STARTER", "TEAMROCKET",
+             "TOGEPI", "TRAINER", "TYPE", "VULPIX", "ZUBAT"],
+    "Mythical Creatures": ["BANSHEE", "BASILISK", "BIGFOOT", "CENTAUR", "CHIMERA", "CHUPACABRA", "CYCLOPS", "DJINN",
+             "DRAGON", "ELF", "FAIRY", "GARUDA", "GIANT", "GNOME", "GOBLIN", "GOLEM", "GRIFFIN",
+             "HARPY", "HYDRA", "IMP", "KAPPA", "KELPIE", "KITSUNE", "KRAKEN", "LEPRECHAUN", "MANTICORE",
+             "MEDUSA", "MERMAID", "MINOTAUR", "NAGA", "NESSIE", "OGRE", "PEGASUS", "PHOENIX", "PIXIE",
+             "QILIN", "SELKIE", "SIREN", "SPHINX", "TENGU", "TROLL", "UNICORN", "VAMPIRE", "WENDIGO",
+             "WEREWOLF", "WYVERN", "YETI"],
+    "Treasure Hunts": ["ATLANTIS", "BOOTY", "BURIED", "CARTER", "CAVE", "CHEST", "CIPHER", "CLUE", "COINS",
+             "COMPASS", "CROSSBONES", "DETECTOR", "DIAMOND", "DIG", "DOUBLOON", "ELDORADO", "EMERALD",
+             "EXPEDITION", "GALLEON", "GEOCACHE", "GOLD", "HOARD", "ISLAND", "JEWELS", "KEY", "KIDD",
+             "LOCK", "LOOT", "MAP", "PARROT", "PEARL", "PHARAOH", "PIRATE", "PLUNDER", "QUEST",
+             "RIDDLE", "RUBY", "SCROLL", "SHIPWRECK", "SHOVEL", "SPADE", "SPYGLASS", "SUTTONHOO",
+             "TOMB", "TORCH", "TRAIL", "TREASURE"],
   };
   // Puzzle categories, in the order shown in the Puzzles list. Every puzzle
   // in THEMES belongs to exactly one category (any that don't show under
@@ -556,7 +587,8 @@
                                      "Dinosaurs"] },
     { name: "Nature", puzzles: ["Animals", "Ocean", "Weather"] },
     { name: "Travel", puzzles: ["Around the World: Vietnam"] },
-    { name: "Play & Adventure", puzzles: ["Sports"] },
+    { name: "Play & Adventure", puzzles: ["Sports", "Theme-Park Rides", "Retro Gaming", "Pokémon",
+                                     "Mythical Creatures", "Treasure Hunts"] },
     { name: "Mind & Language", puzzles: ["Name That Feeling", "Untranslatable Words"] },
   ];
   const categoryOf = (name) => (CATEGORIES.find((c) => c.puzzles.includes(name)) || { name: "Other" }).name;
