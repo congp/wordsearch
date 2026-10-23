@@ -241,15 +241,46 @@
   .dlg-head {
     position: sticky;
     top: 0;
+    z-index: 1;
     background: var(--bg);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
+    padding: 16px 16px 0;
     border-bottom: 1px solid var(--line);
   }
+  .dlg-title-row { display: flex; justify-content: space-between; align-items: center; }
   .dlg-head h2 { margin: 0; font-size: 1.15rem; }
-  .puzzle-list { list-style: none; margin: 0; padding: 12px 16px 16px; display: grid; gap: 12px; }
+  /* Category filter: one row of chips that scrolls sideways */
+  .filters {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin: 12px -16px 0;
+    padding: 0 16px 12px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filters button {
+    flex: none;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .filters button[aria-selected="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .filters .n { opacity: 0.6; font-weight: 500; margin-left: 4px; }
+  .puzzle-groups { padding: 14px 16px 16px; display: grid; gap: 20px; }
+  .group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+  .group-head h3 {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .group-head .progress { font-size: 0.8rem; color: var(--muted); }
+  .puzzle-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
   .puzzle {
     background: var(--panel);
     border-radius: 14px;
@@ -258,14 +289,16 @@
   }
   .puzzle.current { border-color: var(--accent); }
   .puzzle-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .puzzle h3 { margin: 0; font-size: 1rem; }
+  .puzzle h4 { margin: 0; font-size: 1rem; }
+  .puzzle details { margin-top: 8px; }
+  .puzzle summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; }
   .puzzle .count { color: var(--muted); font-size: 0.85rem; font-weight: 500; }
   .puzzle .record { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; font-size: 0.85rem; }
   .puzzle .tick { color: #1f8a43; font-weight: 700; }
   .puzzle .bests { color: var(--ink); display: flex; flex-wrap: wrap; gap: 2px 10px; }
   .puzzle .bests b { font-variant-numeric: tabular-nums; }
   .puzzle button { padding: 7px 14px; font-size: 0.9rem; }
-  .puzzle p { margin: 10px 0 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; letter-spacing: 0.03em; }
+  .puzzle p { margin: 8px 0 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; letter-spacing: 0.03em; }
   /* Word info card */
   dialog.info { width: min(420px, calc(100% - 32px)); overflow: hidden; }
   .info-band { height: 10px; background: var(--line); }
@@ -345,10 +378,13 @@
 
 <dialog id="listDlg">
   <div class="dlg-head">
-    <h2>Puzzles</h2>
-    <button class="secondary" id="closeList">Close</button>
+    <div class="dlg-title-row">
+      <h2>Puzzles</h2>
+      <button class="secondary" id="closeList">Close</button>
+    </div>
+    <div class="filters" id="listFilters" role="tablist" aria-label="Puzzle categories"></div>
   </div>
-  <ul class="puzzle-list" id="puzzleList"></ul>
+  <div class="puzzle-groups" id="puzzleList"></div>
 </dialog>
 
 <!-- Bump ?v= whenever words-info.js changes, so browsers fetch the new descriptions instead of a cached copy. -->
@@ -435,6 +471,23 @@
              "MUAROINUOC", "MYSON", "NONLA", "NUOCMAM", "PHO", "PHUQUOC", "SAIGON", "SAPA", "TET",
              "TRUNGTHU", "XOI"],
   };
+  // Puzzle categories, in the order shown in the Puzzles list. Every puzzle
+  // in THEMES belongs to exactly one category (any that don't show under
+  // "Other"). Category names are part of the analytics data, so don't rename
+  // them casually.
+  const CATEGORIES = [
+    { name: "Pop Culture", puzzles: ["The Office: Characters", "The Office: Dunder Mifflin", "The Office: Moments",
+                                     "The Office: Surnames"] },
+    { name: "Food & Drink", puzzles: ["Fruits"] },
+    { name: "Art & Lifestyle", puzzles: ["Tiny Luxuries"] },
+    { name: "Science & Discovery", puzzles: ["Inside Your Brain", "Space"] },
+    { name: "Nature", puzzles: ["Animals", "Ocean", "Weather"] },
+    { name: "Travel", puzzles: ["Around the World: Vietnam"] },
+    { name: "Play & Adventure", puzzles: ["Sports"] },
+    { name: "Mind & Language", puzzles: ["Name That Feeling", "Untranslatable Words"] },
+  ];
+  const categoryOf = (name) => (CATEGORIES.find((c) => c.puzzles.includes(name)) || { name: "Other" }).name;
+
   const DIRS = [[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]];
 
   // Neon highlight colours, used in this order.
@@ -1045,7 +1098,7 @@
     watchStart();
     if (!boardStarted) {
       boardStarted = true;
-      track("game_started", { puzzle: theme, modes: modeKey(playModes), source: boardSource });
+      track("game_started", { puzzle: theme, category: categoryOf(theme), modes: modeKey(playModes), source: boardSource });
     }
     boardEl.setPointerCapture(e.pointerId);
     start = cellAt(e);
@@ -1093,7 +1146,7 @@
       Sound.setEnergy(found.length / words.length);
       if (found.length === words.length) {
         const r = recordWin(), mode = r.key === "normal" ? "" : ` (${MODE_NAMES[r.key]})`;
-        track("game_completed", { puzzle: theme, modes: r.key, seconds: Math.round(r.ms / 1000),
+        track("game_completed", { puzzle: theme, category: categoryOf(theme), modes: r.key, seconds: Math.round(r.ms / 1000),
           first_finish: r.prev === undefined, new_best: r.prev !== undefined && r.isBest });
         statusEl.textContent = r.isBest
           ? `🎉 Done in ${fmtTime(r.ms)}${mode} — ${r.prev === undefined ? "first finish" : "new personal best"}!`
@@ -1114,24 +1167,74 @@
   document.getElementById("newGame").addEventListener("click", () => newGame(undefined, "new"));
 
   // ---- Puzzle list ----
-  function renderList() {
-    const stats = loadStats();
-    document.getElementById("puzzleList").innerHTML = Object.entries(THEMES).sort(([a], [b]) => a.localeCompare(b)).map(([name, list]) => {
-      const st = stats[name];
-      const bests = st ? Object.keys(MODE_NAMES).filter((k) => st.best[k] !== undefined)
-        .map((k) => `<span><b>${fmtTime(st.best[k])}</b> ${MODE_NAMES[k]}</span>`).join("") : "";
-      return `
+  // Grouped by category, with a filter row. The chosen filter is remembered.
+  const FILTER_KEY = "wordsearch-list-filter";
+  let listFilter = "All";
+  try { listFilter = localStorage.getItem(FILTER_KEY) || "All"; } catch {}
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+
+  function listGroups() {
+    const groups = CATEGORIES.map((c) => ({ name: c.name, puzzles: c.puzzles.filter((p) => THEMES[p]) }));
+    const other = Object.keys(THEMES).filter((p) => !CATEGORIES.some((c) => c.puzzles.includes(p)));
+    if (other.length) groups.push({ name: "Other", puzzles: other });
+    for (const g of groups) g.puzzles.sort((a, b) => a.localeCompare(b));
+    return groups.filter((g) => g.puzzles.length);
+  }
+
+  function puzzleCard(name, stats) {
+    const list = THEMES[name], st = stats[name];
+    const bests = st ? Object.keys(MODE_NAMES).filter((k) => st.best[k] !== undefined)
+      .map((k) => `<span><b>${fmtTime(st.best[k])}</b> ${MODE_NAMES[k]}</span>`).join("") : "";
+    return `
       <li class="puzzle${name === theme ? " current" : ""}${st ? " done" : ""}">
         <div class="puzzle-top">
-          <h3>${name} <span class="count">· ${list.length} words</span></h3>
-          <button data-theme="${name}">${name === theme ? "Replay" : "Play"}</button>
+          <h4>${esc(name)}</h4>
+          <button data-theme="${esc(name)}">${name === theme ? "Replay" : "Play"}</button>
         </div>
         ${st ? `<div class="record"><span class="tick">✓ Completed${st.done > 1 ? ` ×${st.done}` : ""}</span>${bests ? `<span class="bests">Best: ${bests}</span>` : ""}</div>` : ""}
-        <p>${[...list].sort().join(" · ")}</p>
+        <details><summary>${list.length} words</summary><p>${[...list].sort().join(" · ")}</p></details>
       </li>`;
-    }).join("");
   }
-  document.getElementById("openList").addEventListener("click", () => { suspend(); renderList(); listDlg.showModal(); track("puzzles_list_opened"); });
+
+  function renderList() {
+    const stats = loadStats(), groups = listGroups();
+    if (listFilter !== "All" && !groups.some((g) => g.name === listFilter)) listFilter = "All";
+    const total = Object.keys(THEMES).length;
+    document.getElementById("listFilters").innerHTML =
+      [{ name: "All", puzzles: { length: total } }, ...groups].map((g) =>
+        `<button role="tab" aria-selected="${g.name === listFilter}" data-filter="${esc(g.name)}">${esc(g.name)}<span class="n">${g.puzzles.length}</span></button>`).join("");
+    document.getElementById("puzzleList").innerHTML = groups
+      .filter((g) => listFilter === "All" || g.name === listFilter)
+      .map((g) => {
+        const done = g.puzzles.filter((p) => stats[p]).length;
+        return `
+      <section class="group">
+        <div class="group-head"><h3>${esc(g.name)}</h3><span class="progress">${done} of ${g.puzzles.length} completed</span></div>
+        <ul class="puzzle-list">${g.puzzles.map((p) => puzzleCard(p, stats)).join("")}</ul>
+      </section>`;
+      }).join("");
+    const sel = document.querySelector("#listFilters [aria-selected='true']");
+    if (sel) sel.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+
+  document.getElementById("listFilters").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-filter]");
+    if (!b || b.dataset.filter === listFilter) return;
+    listFilter = b.dataset.filter;
+    try { localStorage.setItem(FILTER_KEY, listFilter); } catch {}
+    renderList();
+    listDlg.scrollTop = 0;
+    track("puzzles_filter_changed", { category: listFilter });
+  });
+
+  document.getElementById("openList").addEventListener("click", () => {
+    suspend();
+    renderList();
+    listDlg.showModal();
+    const cur = listDlg.querySelector(".puzzle.current");
+    if (cur) cur.scrollIntoView({ block: "center" });
+    track("puzzles_list_opened");
+  });
   listDlg.addEventListener("close", resume);
 
   // ---- Word info card: tap any word chip to read about it ----
