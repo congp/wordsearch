@@ -30,6 +30,7 @@ Run that from the repository root, then open <http://localhost:8000/>. The same 
 | `words-info.js` | The paragraph shown for every word, grouped by puzzle, as `window.WORD_INFO`. |
 | `docs/how-it-works.md` | Developer guide: architecture, rules, algorithms, saved data, testing. |
 | `docs/design.md` | Design guide: tokens, layout, components, states, motion, sound, copy. |
+| `docs/analytics-plan.md` | Proposed analytics: service choice, events, and the questions they answer. Not implemented yet. |
 | `AGENTS.md` | Brief for AI coding agents: product decisions to keep, how to check changes. |
 | `CLAUDE.md` | Points Claude Code at `AGENTS.md`. |
 | `.claude/launch.json` | Local preview server config. |
