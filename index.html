@@ -388,7 +388,7 @@
 </dialog>
 
 <!-- Bump ?v= whenever words-info.js changes, so browsers fetch the new descriptions instead of a cached copy. -->
-<script src="words-info.js?v=3"></script>
+<script src="words-info.js?v=5"></script>
 <script>
 (() => {
   const SIZE = 10;
@@ -470,6 +470,35 @@
              "HOANKIEM", "HOIAN", "HUE", "LACQUER", "LANTERN", "LAU", "LOTUS", "MEKONG", "MOTORBIKE",
              "MUAROINUOC", "MYSON", "NONLA", "NUOCMAM", "PHO", "PHUQUOC", "SAIGON", "SAPA", "TET",
              "TRUNGTHU", "XOI"],
+    "Food Around the World": ["AREPA", "BAKLAVA", "BIBIMBAP", "BIRYANI", "BOBOTIE", "BORSCHT", "BULGOGI", "CEVICHE",
+             "COUSCOUS", "CREPE", "CURRY", "DIMSUM", "DOSA", "EMPANADA", "FALAFEL", "FEIJOADA",
+             "FONDUE", "FUFU", "GOULASH", "GYROS", "HAGGIS", "HUMMUS", "INJERA", "JOLLOF", "KIMCHI",
+             "LAKSA", "MISO", "MOLE", "MOUSSAKA", "NAAN", "PADTHAI", "PAELLA", "PASTA", "PHO",
+             "PIEROGI", "PIZZA", "POKE", "POUTINE", "RAMEN", "RENDANG", "SATAY", "SCHNITZEL", "SOBA",
+             "SUSHI", "TACO", "TAGINE", "TAMALE", "TAPAS"],
+    "Coffee Culture": ["AEROPRESS", "AFFOGATO", "AMERICANO", "ARABICA", "BARISTA", "BEANS", "BREW", "CAFE",
+             "CAFETIERE", "CAFFEINE", "CAPPUCCINO", "CHEMEX", "COLDBREW", "CORTADO", "CREMA", "CUP",
+             "CUPPING", "DALGONA", "DECAF", "DOPPIO", "EGGCOFFEE", "ESPRESSO", "ETHIOPIA", "FILTER",
+             "FLATWHITE", "GRIND", "JAVA", "JOE", "KALDI", "LATTE", "LATTEART", "LUNGO", "MACCHIATO",
+             "MILK", "MOCHA", "MOKAPOT", "MUG", "PHIN", "POUROVER", "RISTRETTO", "ROAST", "ROBUSTA",
+             "SHOT", "STEAM", "TAMPER", "TURKISH"],
+    "Desserts": ["ALFAJOR", "BABKA", "BINGSU", "BRIGADEIRO", "BROWNIE", "BUNDT", "CAKE", "CANNOLI", "CHE",
+             "CHEESECAKE", "CHURROS", "COOKIE", "CREPE", "CRUMBLE", "CUPCAKE", "CUSTARD", "DANGO",
+             "DONUT", "DORAYAKI", "ECLAIR", "FLAN", "FUDGE", "GELATO", "GULABJAMUN", "HALOHALO",
+             "HALVA", "ICECREAM", "JELLY", "KHEER", "KULFI", "LAMINGTON", "MERINGUE", "MOCHI", "MOUSSE",
+             "MUFFIN", "PANNACOTTA", "PAVLOVA", "PIE", "PUDDING", "SCONE", "SORBET", "SOUFFLE",
+             "STRUDEL", "SUNDAE", "TART", "TIRAMISU", "TOFFEE", "TORTE", "TRESLECHES", "TRIFLE"],
+    "Cooking Techniques": ["BAKE", "BASTE", "BLANCH", "BOIL", "BRAISE", "BRINE", "BROIL", "CARAMELISE", "CHAR",
+             "CHOP", "CONFIT", "CURE", "DEEPFRY", "DEGLAZE", "DICE", "EMULSIFY", "FERMENT", "FLAMBE",
+             "FOLD", "FRY", "GRATE", "GRILL", "JULIENNE", "KNEAD", "MARINATE", "MINCE", "PICKLE",
+             "POACH", "PROOF", "PUREE", "REDUCE", "ROAST", "SAUTE", "SEAR", "SIMMER", "SMOKE",
+             "SOUSVIDE", "STEAM", "STIRFRY", "TEMPER", "TOAST", "WHISK", "ZEST"],
+    "Street Food": ["ARANCINI", "AREPA", "BAGEL", "BANHMI", "BAO", "BHAJI", "BURRITO", "CART", "CHAAT",
+             "CHURROS", "CORNDOG", "CREPE", "CURRYWURST", "DOSA", "ELOTE", "FALAFEL", "FISHBALL",
+             "FRIES", "GYOZA", "HAWKER", "HOTDOG", "HOTTEOK", "JIANBING", "KEBAB", "KOTTU", "LANGOS",
+             "MARKET", "MURTABAK", "NOODLES", "PAKORA", "PANIPURI", "PHO", "POFFERTJES", "PRETZEL",
+             "QUESADILLA", "ROTI", "SAMOSA", "SATAY", "SHAWARMA", "SKEWER", "SOCCA", "STALL", "SUYA",
+             "TACO", "TAKOYAKI", "TTEOKBOKKI", "VADAPAV", "WAFFLE", "YAKITORI"],
   };
   // Puzzle categories, in the order shown in the Puzzles list. Every puzzle
   // in THEMES belongs to exactly one category (any that don't show under
@@ -478,7 +507,8 @@
   const CATEGORIES = [
     { name: "Pop Culture", puzzles: ["The Office: Characters", "The Office: Dunder Mifflin", "The Office: Moments",
                                      "The Office: Surnames"] },
-    { name: "Food & Drink", puzzles: ["Fruits"] },
+    { name: "Food & Drink", puzzles: ["Fruits", "Food Around the World", "Coffee Culture", "Desserts",
+                                     "Cooking Techniques", "Street Food"] },
     { name: "Art & Lifestyle", puzzles: ["Tiny Luxuries"] },
     { name: "Science & Discovery", puzzles: ["Inside Your Brain", "Space"] },
     { name: "Nature", puzzles: ["Animals", "Ocean", "Weather"] },
