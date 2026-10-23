@@ -388,7 +388,7 @@
 </dialog>
 
 <!-- Bump ?v= whenever words-info.js changes, so browsers fetch the new descriptions instead of a cached copy. -->
-<script src="words-info.js?v=6"></script>
+<script src="words-info.js?v=7"></script>
 <script>
 (() => {
   const SIZE = 10;
@@ -523,6 +523,24 @@
              "LACE", "LAVENDER", "LINEN", "MEADOW", "MOSS", "MUSHROOM", "ORCHARD", "PICNIC", "PIE",
              "POTTERY", "QUILT", "SCONE", "SOURDOUGH", "STREAM", "SUNHAT", "TEAPOT", "THATCH",
              "WILDFLOWER"],
+    "Artificial Intelligence": ["AGENT", "AI", "ALGORITHM", "ALIGNMENT", "ALPHAGO", "ATTENTION", "BENCHMARK", "BIAS",
+             "CAPTCHA", "CHATBOT", "CHIP", "CODE", "DATA", "DATASET", "DEEPBLUE", "ELIZA", "EMBEDDING",
+             "EPOCH", "FINETUNE", "GPU", "INFERENCE", "LABEL", "LAYER", "LLM", "LOGIC", "LOSS", "MODEL",
+             "NETWORK", "NEURAL", "OVERFIT", "PARAMETER", "PATTERN", "PERCEPTRON", "PREDICT", "PROMPT",
+             "PYTHON", "ROBOT", "SENSOR", "SPEECH", "TOKEN", "TRAINING", "TURING", "VECTOR", "VISION",
+             "WEIGHTS"],
+    "Space Exploration": ["ALDRIN", "APOLLO", "ARMSTRONG", "ARTEMIS", "ASTRONAUT", "BOOSTER", "CAPSULE", "CASSINI",
+             "COSMONAUT", "COUNTDOWN", "CREW", "CURIOSITY", "DOCKING", "ESA", "FUEL", "GAGARIN",
+             "GEMINI", "GLENN", "HATCH", "HUBBLE", "ISRO", "ISS", "JAXA", "LAIKA", "LANDER", "LAUNCH",
+             "LIFTOFF", "MIR", "MISSION", "MODULE", "NASA", "ORBIT", "PAYLOAD", "PROBE", "REENTRY",
+             "ROVER", "SATELLITE", "SHUTTLE", "SKYLAB", "SPACESUIT", "SPACEWALK", "SPUTNIK",
+             "TERESHKOVA", "TETHER", "THRUST", "VISOR", "VOYAGER", "WEBB"],
+    "Dinosaurs": ["ALLOSAURUS", "AMBER", "BIRDS", "BONES", "CARNIVORE", "CHICXULUB", "CLAW", "COPROLITE",
+             "CREST", "CRETACEOUS", "DIG", "DIPLODOCUS", "EGG", "EXTINCTION", "FEATHERS", "FOSSIL",
+             "HADROSAUR", "HATCH", "HERBIVORE", "HERD", "HORN", "IGUANODON", "IMPACT", "JAWS",
+             "JURASSIC", "LIZARD", "MEI", "MESOZOIC", "MINMI", "MOSASAUR", "MUSEUM", "NEST", "PANGAEA",
+             "PLATES", "PTEROSAUR", "RAPTOR", "ROAR", "SAUROPOD", "SCALES", "SPIKES", "SUE", "TAIL",
+             "TAWA", "THEROPOD", "TOOTH", "TRACKS", "TREX", "TRIASSIC", "TROODON", "ZUUL"],
   };
   // Puzzle categories, in the order shown in the Puzzles list. Every puzzle
   // in THEMES belongs to exactly one category (any that don't show under
@@ -534,7 +552,8 @@
     { name: "Food & Drink", puzzles: ["Fruits", "Food Around the World", "Coffee Culture", "Desserts",
                                      "Cooking Techniques", "Street Food"] },
     { name: "Art & Lifestyle", puzzles: ["Tiny Luxuries", "Art History", "Colour Theory", "Interior Design", "Cottagecore"] },
-    { name: "Science & Discovery", puzzles: ["Inside Your Brain", "Space"] },
+    { name: "Science & Discovery", puzzles: ["Inside Your Brain", "Space", "Artificial Intelligence", "Space Exploration",
+                                     "Dinosaurs"] },
     { name: "Nature", puzzles: ["Animals", "Ocean", "Weather"] },
     { name: "Travel", puzzles: ["Around the World: Vietnam"] },
     { name: "Play & Adventure", puzzles: ["Sports"] },
