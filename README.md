@@ -4,7 +4,7 @@ A mobile-first word search game. Tap a letter and swipe across a word to find it
 
 ## Features at a glance
 
-- **10 puzzles:** Animals, Fruits, Ocean, Space, Sports, Weather, and four The Office (US) puzzles. Each board is a fresh 10×10 grid with 20 words drawn from that puzzle's word list.
+- **15 puzzles:** Animals, Fruits, Ocean, Space, Sports, Weather; four The Office (US) puzzles; and five from the theme library: Untranslatable Words, Name That Feeling, Tiny Luxuries, Inside Your Brain, and Around the World: Vietnam. Each board is a fresh 10×10 grid with 20 words drawn from that puzzle's word list.
 - **Lots of crossings:** the generator deliberately packs words so they overlap, like a printed puzzle book. Words can even hide inside other words (SKI inside SKIING).
 - **Neon highlights:** six colours in a fixed order (yellow, green, orange, blue, purple, pink). The colour switches by rule, and overlapping highlights mix into new shades.
 - **Game modes:**

@@ -32,7 +32,7 @@ The owner made these deliberately. Ask before changing any of them; the reasons 
 
 ## When you add or change content
 
-- **New word:** A–Z, 2–10 letters, added to `THEMES`, **and** a paragraph added to `words-info.js` under the same puzzle name.
+- **New word:** A–Z, 2–10 letters, added to `THEMES`, **and** a paragraph added to `words-info.js` under the same puzzle name. Whenever `words-info.js` changes, bump the `?v=` on its `<script>` tag in `index.html`, or returning players get stale descriptions.
 - **Paragraphs:** factual, one or two sentences. For The Office, never invent episode details; if unsure, keep it general or ask.
 
 ## Verify before you report done

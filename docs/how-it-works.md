@@ -86,6 +86,8 @@ A **found-word entry** looks like this:
 - **List size:** keep at least about 30 words per puzzle so replays feel different. Long words lower how many fit (see the note on "The Office: Surnames" in §15).
 - **Words inside other words are allowed and intended.** SKI/SKIING, SUN/SUNNY, DART/DARTS. The generator will usually nest the short word inside the long one (§4), and Rule 3 (§6) gives the two highlights different colours.
 - **Every word needs a paragraph** in `words-info.js` under the same puzzle name (§10).
+- **Accented words lose their accents in the grid** (PHỞ → PHO, ÁO DÀI → AODAI, gemütlich → GEMUTLICH), and multi-word names are joined. The paragraph gives the proper spelling.
+- **Keep the average word length around 6 letters.** Puzzles of long words can't fit 20 on a 10×10 grid; add short entries to compensate.
 
 The Puzzles list sorts puzzles alphabetically by name. The word chips under the grid are alphabetical because `generate()` sorts `words`.
 
@@ -102,7 +104,10 @@ The Puzzles list sorts puzzles alphabetically by name. The word chips under the 
 4. **Retry:** repeat the whole attempt up to 40 times and keep the attempt that placed the most words. It usually succeeds on the first attempt.
 5. **Fill the rest:** empty cells get random letters A–Z.
 
-Measured with 30–100 simulated boards per puzzle, all puzzles place 20 words every time except "The Office: Surnames", which averages about 18 because its names are long.
+Measured with 20–100 simulated boards per puzzle:
+- most puzzles place 20 words every time;
+- Untranslatable Words, Name That Feeling and Inside Your Brain average 19.7–19.9;
+- "The Office: Surnames" averages about 18, because its names are long.
 
 A short word can also appear by chance in the random filler letters. Swiping that copy still counts as finding the word.
 
@@ -141,7 +146,7 @@ These rules were specified by the product owner, so keep their behaviour exactly
 | 3 | If two words **share letters and lie on the same straight line** (one nested in the other, or overlapping end to end), the new word must use a different colour. | Reject the colour if any same-colour overlapping word is `collinear`, meaning a parallel or opposite `dir`. Collinear and overlapping together means the same line. |
 | 4 | A highlight may cross several colours, but **if it crosses 2 or more highlights and one of them is the current colour, switch**. | Reject the colour if `overlapping.length >= 2` and any of them has that colour. |
 
-If all six colours are rejected, which is extremely unlikely, it keeps `colorIdx`.
+Sometimes **no colour can satisfy the rules**, for example when a long word crosses highlights of all six colours. That happened in 7 of about 6,000 highlights in testing. `pickColor` then chooses the least-bad colour: it never shares a colour with a same-line word if it can avoid it, then crosses as few same-colour words as possible, with ties going in the usual order.
 
 Rule 4 is stricter than Rule 2. Rule 2 alone would allow a yellow word to cross one yellow and one green word; Rule 4 does not. The product owner chose to keep both.
 
@@ -283,7 +288,8 @@ If you change the stats schema, migrate the old data or start a new key. Don't s
 **Add or edit a puzzle**
 1. Add the word list to `THEMES` (A–Z, 2–10 letters, at least about 30 words).
 2. Add a paragraph for **every** word to `words-info.js` under the same puzzle name.
-3. Run the coverage check and the fit check (§14). Aim for 20 words placed in about 100% of boards.
+3. **Bump the version** in `<script src="words-info.js?v=N">` in `index.html`. Otherwise returning players' browsers may keep the old cached file and show "No description yet" for the new words.
+4. Run the coverage check and the fit check (§14). Aim for 20 words placed in about 100% of boards.
 
 **Change the grid or word count:** `SIZE` and `WORDS_PER_GAME`. A 10×10 grid fits 20 words reliably; more needs a bigger grid or shorter words. The cell font size (`clamp(14px, 5.2vw, 26px)`) is tuned for 10 columns.
 

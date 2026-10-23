@@ -351,7 +351,8 @@
   <ul class="puzzle-list" id="puzzleList"></ul>
 </dialog>
 
-<script src="words-info.js"></script>
+<!-- Bump ?v= whenever words-info.js changes, so browsers fetch the new descriptions instead of a cached copy. -->
+<script src="words-info.js?v=3"></script>
 <script>
 (() => {
   const SIZE = 10;
@@ -404,6 +405,35 @@
               "DROUGHT", "FLOOD", "FOG", "FOGGY", "FREEZE", "FROST", "GALE", "GUST", "HAIL", "HAZE", "HEAT",
               "HUMID", "ICE", "MIST", "MONSOON", "RAIN", "RAINBOW", "SHOWER", "SLEET", "SNOW", "SQUALL",
               "STORM", "SUN", "SUNNY", "THUNDER", "TORNADO", "TYPHOON", "WIND"],
+    "Untranslatable Words": ["ABBIOCCO", "AMAE", "CULACINO", "DOR", "DUENDE", "FERNWEH", "FIKA", "FIRGUN", "FLANEUR",
+             "FORELSKET", "GATTARA", "GEMUTLICH", "GEZELLIG", "GIGIL", "HAN", "HIRAETH", "HUZUN",
+             "HYGGE", "IKIGAI", "ITSUARPOK", "JAYUS", "JEONG", "JUGAAD", "KEFI", "KILIG", "KOINOYOKAN",
+             "KOMOREBI", "LAGOM", "LITOST", "MERAKI", "MUDITA", "NUNCHI", "PALEGG", "SAUDADE",
+             "SEHNSUCHT", "SHIBUI", "SISU", "SOBREMESA", "TARAB", "TOSKA", "TSUNDOKU", "UBUNTU",
+             "UTEPILS", "WABISABI", "YUGEN"],
+    "Name That Feeling": ["AMUSED", "ANGRY", "ANXIOUS", "AWE", "BEWILDERED", "BLISSFUL", "BORED", "CALM", "CONTENT",
+             "COSY", "CURIOUS", "DREAD", "EAGER", "ELATED", "ENNUI", "ENVIOUS", "EUPHORIC", "FLUSTERED",
+             "FOND", "FRUSTRATED", "GIDDY", "GLAD", "GLUM", "GRATEFUL", "HOPEFUL", "HURT", "INSPIRED",
+             "JEALOUS", "JOYFUL", "LONELY", "LONGING", "MELANCHOLY", "NOSTALGIC", "PROUD", "RELIEVED",
+             "RESTLESS", "SAD", "SERENE", "SHEEPISH", "SHY", "SMITTEN", "SONDER", "TENDER",
+             "VULNERABLE", "WISTFUL", "WONDER", "YEARNING"],
+    "Tiny Luxuries": ["BATH", "BATHBOMB", "BOOKSHOP", "BOUQUET", "BRIOCHE", "BRUNCH", "BUBBLEBATH", "CAKE",
+             "CANDLE", "CASHMERE", "CHAMPAGNE", "CHOCOLATE", "CROISSANT", "DUVET", "ESPRESSO",
+             "FIREPLACE", "GELATO", "HONEY", "JAM", "LATTE", "LAVENDER", "LINEN", "MACARON",
+             "MARMALADE", "MASSAGE", "MATCHA", "NAP", "PASTRY", "PEONY", "PERFUME", "PILLOW",
+             "POSTCARD", "ROBE", "ROSE", "SATIN", "SAUNA", "SHEETS", "SILK", "SLIPPERS", "SOAP", "SPA",
+             "SUNSHINE", "TEA", "TRUFFLE", "VELVET", "VINYL"],
+    "Inside Your Brain": ["ADRENALINE", "AMYGDALA", "ATTENTION", "AXON", "BRAINSTEM", "CELL", "CEREBELLUM", "CORTEX",
+             "CORTISOL", "DENDRITE", "DOPAMINE", "DREAM", "EMOTION", "ENDORPHIN", "FOCUS", "GABA",
+             "GLIA", "HABIT", "HEMISPHERE", "IDEA", "IMPULSE", "LEARNING", "LOBE", "MELATONIN",
+             "MEMORY", "MIND", "MOOD", "MYELIN", "NERVE", "NEURON", "OXYTOCIN", "PAIN", "PERCEPTION",
+             "PLASTICITY", "RECEPTOR", "REFLEX", "REM", "SENSES", "SEROTONIN", "SIGNAL", "SKULL",
+             "SLEEP", "SMELL", "SPINALCORD", "SYNAPSE", "TASTE", "THALAMUS", "TOUCH", "VISION", "YAWN"],
+    "Around the World: Vietnam": ["AODAI", "BANHCHUNG", "BANHMI", "BANHXEO", "BUNBOHUE", "BUNCHA", "CAPHE", "CHAGIO", "CHE",
+             "COMTAM", "CYCLO", "DALAT", "DANANG", "DANBAU", "DONG", "GOICUON", "HALONG", "HANOI",
+             "HOANKIEM", "HOIAN", "HUE", "LACQUER", "LANTERN", "LAU", "LOTUS", "MEKONG", "MOTORBIKE",
+             "MUAROINUOC", "MYSON", "NONLA", "NUOCMAM", "PHO", "PHUQUOC", "SAIGON", "SAPA", "TET",
+             "TRUNGTHU", "XOI"],
   };
   const DIRS = [[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]];
 
@@ -993,7 +1023,19 @@
       const c = (colorIdx + i) % COLORS.length;
       if (colorAllowed(c, entry, overlapping)) return c;
     }
-    return colorIdx; // every colour conflicts (very unlikely) — keep the current one
+    // Every colour breaks a rule. This happens when a long word crosses
+    // highlights of all six colours. Pick the least-bad colour instead:
+    // avoid sharing a colour with a word on the same line (the hardest clash
+    // to see), then cross as few same-colour words as possible. Ties keep the
+    // usual order starting from the current colour.
+    let best = colorIdx, bestScore = Infinity;
+    for (let i = 0; i < COLORS.length; i++) {
+      const c = (colorIdx + i) % COLORS.length;
+      const same = overlapping.filter((f) => f.color === c);
+      const score = same.filter((f) => collinear(f, entry)).length * 100 + same.length;
+      if (score < bestScore) { best = c; bestScore = score; }
+    }
+    return best;
   }
 
   boardEl.addEventListener("pointerdown", (e) => {
