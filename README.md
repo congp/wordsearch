@@ -30,10 +30,16 @@ Run that from the repository root, then open <http://localhost:8000/>. The same 
 | `words-info.js` | The paragraph shown for every word, grouped by puzzle, as `window.WORD_INFO`. |
 | `docs/how-it-works.md` | Developer guide: architecture, rules, algorithms, saved data, testing. |
 | `docs/design.md` | Design guide: tokens, layout, components, states, motion, sound, copy. |
-| `docs/analytics-plan.md` | Proposed analytics: service choice, events, and the questions they answer. Not implemented yet. |
+| `docs/analytics.md` | Analytics: what is tracked (Umami, cookie-free), the events, and the questions they answer. |
 | `AGENTS.md` | Brief for AI coding agents: product decisions to keep, how to check changes. |
 | `CLAUDE.md` | Points Claude Code at `AGENTS.md`. |
 | `.claude/launch.json` | Local preview server config. |
+
+## Privacy
+
+The game uses [Umami](https://umami.is), a cookie-free analytics service, to count visits (with approximate location: country, region and city) and gameplay events such as which puzzles are started and finished. It doesn't use cookies or collect names, emails or other personal data, and it doesn't send players' saved best times. Details are in `docs/analytics.md`. A footnote at the bottom of the game says the same.
+
+To stop your own visits being counted, open `congph.com/wordsearch/?analytics=off` once in each browser you use (`?analytics=on` undoes it).
 
 ## Hosting and deploying
 

@@ -201,6 +201,10 @@ There's **no spare room**. Anything new on the main screen has to replace someth
 - **Next (In order mode):** a 2 px ink outline (border plus 1 px ring) on the next word to find.
 - **Rejected (out-of-order swipe):** a 0.35 s horizontal shake.
 
+### Analytics footnote
+- **Look:** one centred line of small muted text (0.72rem) under the word chips: "This game uses anonymous, cookie-free analytics (Umami). No personal data is collected." The link to umami.is uses the same colour as the text.
+- **Position:** it sits after the chips, so on short screens it's just below the fold when the word list wraps to 7 rows. That's fine for a footnote: it never pushes the board or chips.
+
 ### Puzzles list (dialog)
 - **Frame:** a modal sheet on the paper background, at most 560 px wide. It has a sticky header with the "Puzzles" title and a Close button.
 - **Puzzle card:** white and rounded, showing:
@@ -288,6 +292,7 @@ The voice is short, friendly and plain. There's one emoji per moment at most, sa
 | Mode suffix | (In order), (Crazy), (In order + Crazy) |
 | Puzzles list record | ✓ Completed ×3 · Best: 1:58 Normal |
 | Word card with no text | No description yet for this word. |
+| Analytics footnote | This game uses anonymous, cookie-free analytics (Umami). No personal data is collected. |
 
 **Word card paragraphs** are one or two plain, factual sentences, about 15–40 words, in British-leaning spelling ("colour", "favourite") to match the rest of the copy.
 

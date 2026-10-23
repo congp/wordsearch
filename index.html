@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#1f2a44">
 <title>Word Search</title>
+<!-- Cookie-free, anonymous analytics (Umami). Only reports from congph.com, never from local copies. See docs/analytics.md -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="901a1081-aadb-4708-8d88-bf34261b4ac0" data-domains="congph.com"></script>
 <style>
   :root {
     --bg: #f4f1ea;
@@ -272,6 +274,8 @@
   .info-body h2 { margin: 4px 0 10px; font-size: 1.5rem; letter-spacing: 0.06em; }
   .info-text { margin: 0 0 18px; line-height: 1.55; font-size: 1rem; }
   .info-body button { width: 100%; }
+  .footnote { margin: 4px 0 0; text-align: center; font-size: 0.72rem; color: var(--muted); }
+  .footnote a { color: inherit; }
 </style>
 </head>
 <body>
@@ -326,6 +330,7 @@
     </div>
   </section>
   <ul class="words" id="words"></ul>
+  <p class="footnote">This game uses anonymous, cookie-free analytics (<a href="https://umami.is" target="_blank" rel="noopener">Umami</a>). No personal data is collected.</p>
 </main>
 
 <dialog id="infoDlg" class="info" aria-labelledby="infoWord">
@@ -541,6 +546,41 @@
     };
   })();
 
+  // ---- Analytics (Umami) ----
+  // Events and their fields are documented in docs/analytics.md; treat
+  // them like saved data and don't rename them. Tracking must never affect
+  // play, so every call is guarded. Add ?debug-analytics to the URL to log
+  // events to the console.
+  const DEBUG_ANALYTICS = /[?&]debug-analytics\b/.test(location.search);
+  function track(name, data) {
+    try {
+      if (DEBUG_ANALYTICS) console.log("[analytics]", name, data || {});
+      if (window.umami && typeof window.umami.track === "function") window.umami.track(name, data);
+    } catch {}
+  }
+  // How the current board appeared, and whether anyone has swiped on it yet.
+  let boardSource = "load", boardStarted = false;
+
+  // Owner opt-out, per browser: open the page once with ?analytics=off (or =on
+  // to undo). Uses Umami's own "umami.disabled" setting, so the script stops
+  // sending anything from this browser. Runs before the deferred Umami script.
+  try {
+    const opt = (location.search.match(/[?&]analytics=(on|off)\b/) || [])[1];
+    if (opt === "off") localStorage.setItem("umami.disabled", "1");
+    if (opt === "on") localStorage.removeItem("umami.disabled");
+  } catch {}
+
+  // Closing or leaving the page mid-game counts as giving up. If the browser
+  // later restores the page from its back/forward cache, the next swipe is a
+  // fresh start ("resume") so every start still has exactly one ending.
+  addEventListener("pagehide", () => {
+    if (!boardStarted || found.length === words.length) return;
+    track("game_abandoned", { puzzle: theme, modes: modeKey(playModes), found: found.length,
+      total: words.length, seconds: Math.round(elapsedMs() / 1000), closed: true });
+    boardStarted = false;
+    boardSource = "resume";
+  });
+
   const boardEl = document.getElementById("board");
   const gridEl = document.getElementById("grid");
   const svg = document.getElementById("overlay");
@@ -609,7 +649,13 @@
     return { grid: best.g, words: best.placed.sort() };
   }
 
-  function newGame(themeName) {
+  function newGame(themeName, source = "new") {
+    if (boardStarted && found.length < words.length) {
+      track("game_abandoned", { puzzle: theme, modes: modeKey(playModes), found: found.length,
+        total: words.length, seconds: Math.round(elapsedMs() / 1000), closed: false });
+    }
+    boardSource = source;
+    boardStarted = false;
     const names = Object.keys(THEMES);
     theme = themeName || names[Math.floor(Math.random() * names.length)];
     const p = generate(theme);
@@ -652,7 +698,7 @@
     soundBtn.setAttribute("aria-pressed", String(v));
     try { localStorage.setItem("wordsearch-music", v ? "1" : "0"); } catch {}
   }
-  soundBtn.addEventListener("click", () => setSound(!Sound.on));
+  soundBtn.addEventListener("click", () => { setSound(!Sound.on); track("music_toggled", { on: Sound.on }); });
   let musicPref = false;
   try { musicPref = localStorage.getItem("wordsearch-music") === "1"; } catch {}
   if (musicPref) {
@@ -739,12 +785,14 @@
     boardEl.classList.add("timeup");
     if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
     statusEl.textContent = "⏰ Time's up! Starting over…";
+    track("crazy_timeout", { puzzle: theme, found: found.length, total: words.length, crazy_seconds: Number(secsEl.value) });
+    boardStarted = false;
     Sound.setUrgent(false);
     Sound.timeUp();
     setTimeout(() => {
       resetting = false;
       boardEl.classList.remove("timeup");
-      newGame(theme);
+      newGame(theme, "crazy_reset");
       statusEl.textContent = "New board — tap to start the clock.";
     }, 1100);
   }
@@ -752,11 +800,13 @@
   crazyEl.addEventListener("change", () => {
     try { localStorage.setItem("wordsearch-crazy", crazyEl.checked ? "1" : "0"); } catch {}
     if (!crazyEl.checked && playModes) playModes.crazy = false;
+    track("mode_toggled", { mode: "crazy", on: crazyEl.checked });
     armClock();
     if (crazyEl.checked && !gameOver()) statusEl.textContent = "Crazy mode — the clock starts on your next swipe.";
   });
   secsEl.addEventListener("change", () => {
     try { localStorage.setItem("wordsearch-crazy-secs", secsEl.value); } catch {}
+    track("crazy_seconds_changed", { crazy_seconds: Number(secsEl.value) });
     armClock();
   });
 
@@ -793,6 +843,7 @@
     return true;
   }
   function watchReset() { playMs = 0; playFrom = null; playModes = null; }
+  const elapsedMs = () => playMs + (playFrom === null ? 0 : performance.now() - playFrom);
 
   const MODE_NAMES = { normal: "Normal", order: "In order", crazy: "Crazy", "order+crazy": "In order + Crazy" };
   const modeKey = (m) => [m.order && "order", m.crazy && "crazy"].filter(Boolean).join("+") || "normal";
@@ -826,6 +877,7 @@
   inOrderEl.addEventListener("change", () => {
     try { localStorage.setItem("wordsearch-in-order", inOrderEl.checked ? "1" : "0"); } catch {}
     if (!inOrderEl.checked && playModes) playModes.order = false;
+    track("mode_toggled", { mode: "order", on: inOrderEl.checked });
     markNext();
   });
 
@@ -949,6 +1001,10 @@
     e.preventDefault();
     startClock();
     watchStart();
+    if (!boardStarted) {
+      boardStarted = true;
+      track("game_started", { puzzle: theme, modes: modeKey(playModes), source: boardSource });
+    }
     boardEl.setPointerCapture(e.pointerId);
     start = cellAt(e);
     current = start;
@@ -995,6 +1051,8 @@
       Sound.setEnergy(found.length / words.length);
       if (found.length === words.length) {
         const r = recordWin(), mode = r.key === "normal" ? "" : ` (${MODE_NAMES[r.key]})`;
+        track("game_completed", { puzzle: theme, modes: r.key, seconds: Math.round(r.ms / 1000),
+          first_finish: r.prev === undefined, new_best: r.prev !== undefined && r.isBest });
         statusEl.textContent = r.isBest
           ? `🎉 Done in ${fmtTime(r.ms)}${mode} — ${r.prev === undefined ? "first finish" : "new personal best"}!`
           : `🎉 Done in ${fmtTime(r.ms)}${mode} · best ${fmtTime(r.prev)}`;
@@ -1011,7 +1069,7 @@
 
   boardEl.addEventListener("pointerup", endSelection);
   boardEl.addEventListener("pointercancel", endSelection);
-  document.getElementById("newGame").addEventListener("click", () => newGame());
+  document.getElementById("newGame").addEventListener("click", () => newGame(undefined, "new"));
 
   // ---- Puzzle list ----
   function renderList() {
@@ -1031,7 +1089,7 @@
       </li>`;
     }).join("");
   }
-  document.getElementById("openList").addEventListener("click", () => { suspend(); renderList(); listDlg.showModal(); });
+  document.getElementById("openList").addEventListener("click", () => { suspend(); renderList(); listDlg.showModal(); track("puzzles_list_opened"); });
   listDlg.addEventListener("close", resume);
 
   // ---- Word info card: tap any word chip to read about it ----
@@ -1048,6 +1106,7 @@
     document.getElementById("infoBand").style.background = f ? COLORS[f.color].hex : "";
     suspend();   // crazy-mode clock waits while you read
     infoDlg.showModal();
+    track("word_card_opened", { puzzle: theme, word, found: !!f });
   });
   document.getElementById("infoClose").addEventListener("click", () => infoDlg.close());
   infoDlg.addEventListener("click", (e) => { if (e.target === infoDlg) infoDlg.close(); });
@@ -1056,10 +1115,10 @@
   listDlg.addEventListener("click", (e) => {
     if (e.target === listDlg) return listDlg.close();   // tap on backdrop
     const t = e.target.closest("button[data-theme]");
-    if (t) { newGame(t.dataset.theme); listDlg.close(); }
+    if (t) { newGame(t.dataset.theme, t.dataset.theme === theme ? "replay" : "list"); listDlg.close(); }
   });
 
-  newGame();
+  newGame(undefined, "load");
 })();
 </script>
 </body>

@@ -20,6 +20,7 @@ This is the developer guide to the Word Search game: what each part does, the ru
 14. [Testing and verifying](#14-testing-and-verifying)
 15. [Known limitations](#15-known-limitations)
 16. [Decision log](#16-decision-log)
+17. [Analytics](#17-analytics)
 
 ---
 
@@ -273,6 +274,7 @@ Every read and write is wrapped in `try/catch`, and the game works fine without 
 | `wordsearch-crazy` | `"1"` / `"0"` | Crazy switch |
 | `wordsearch-crazy-secs` | `"10"` … `"60"` | Seconds select |
 | `wordsearch-stats` | JSON, see §9 | `recordWin` |
+| `umami.disabled` | `"1"` when set | `?analytics=off` (owner opt-out, §17). This is Umami's own key. |
 
 If you change the stats schema, migrate the old data or start a new key. Don't silently break players' records.
 
@@ -348,3 +350,14 @@ These are product decisions, made deliberately with the product owner. Keep them
 | Bests kept per mode combination; a mode must stay on all game | Fair comparisons; you can't earn a harder-mode record by switching it on late. |
 | Generative music, off by default | The owner wanted music like 1in8b.life, which is code-generated; browsers block audio before a tap. |
 | HAY replaced by MUG in "The Office: Moments" | No accurate description could be written for HAY. |
+
+## 17. Analytics
+
+The game sends anonymous, cookie-free gameplay events to Umami Cloud. **The full reference is `docs/analytics.md`**: events, fields, call points and testing. In short:
+
+- **Script:** the Umami script in `<head>` only reports from `congph.com` (`data-domains`), so localhost never sends data.
+- **Sending:** all events go through `track(name, data)`. It's guarded, so a blocked or failed script never affects play. `?debug-analytics` logs each call to the console.
+- **Nine events,** about 2–5 per board: `game_started` (first swipe), then exactly one ending (`game_completed`, `game_abandoned` or `crazy_timeout`), plus toggles, word cards and the Puzzles list.
+  - `boardSource` / `boardStarted` track each board's lifecycle.
+  - `newGame(theme, source)` takes the source (`load`, `new`, `list`, `replay`, `crazy_reset`; `resume` after a back/forward-cache restore).
+- **Treat event names and fields like saved data:** renaming or removing them breaks the dashboards and history.
