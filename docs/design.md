@@ -36,7 +36,7 @@ A redesign must keep these. Each one is tied to game logic or a product decision
 | **Square 10 × 10 grid, cells of equal size.** | Selection maps pointer position straight to a cell, and highlights are drawn in cell units. |
 | **The board must be a light, near-white surface.** | Highlights use `mix-blend-mode: multiply` to mix colours where they overlap. Multiply on a dark surface turns them muddy or invisible. A dark mode needs a different blending approach; see §11. |
 | **Highlight bars stay under 0.707 cells thick** (currently 0.7). | The game decides which highlights "overlap", which drives the colour rules, by geometry that assumes this width. Thicker bars would visibly touch without the rules noticing. |
-| **Highlight colour order is fixed:** yellow → green → orange → blue → purple → pink. | The order *is* a game rule: colours switch to the next one in this sequence. You can change the exact hex values, but keep six distinct, bright, multiply-friendly colours. |
+| **Highlight colour order is fixed:** yellow → green → orange → blue → purple → pink. | The order *is* a game rule: colours switch to the next one in this sequence, starting from a random colour each round and wrapping around. You can change the exact hex values, but keep six distinct, bright, multiply-friendly colours. |
 | **Highlights sit behind the letters.** | Letters must stay readable through any number of layered highlights. |
 | **No page scroll while swiping on the board** (`touch-action: none`). | Otherwise a swipe scrolls the page instead of selecting. |
 | **Everything fits in 375 × 812 without scrolling during play.** | You need to see the grid and the word list together, especially in crazy mode. The vertical budget is in §4. |

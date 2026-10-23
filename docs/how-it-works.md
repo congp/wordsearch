@@ -149,7 +149,7 @@ These rules were specified by the product owner, so keep their behaviour exactly
 
 | # | Rule | Implementation |
 |---|---|---|
-| 1 | Start with one colour, yellow, and **stay on the current colour** until a rule forces a switch. A switch moves to the next colour in the list and *stays* there, wrapping from pink back to yellow. | `colorIdx` persists between words; `pickColor` tries `colorIdx`, then `colorIdx + 1`, and so on. |
+| 1 | Start each round on a **random** colour, and **stay on the current colour** until a rule forces a switch. A switch moves to the next colour in the list and *stays* there, wrapping from pink back to yellow. | `newGame()` sets `colorIdx` to a random index; it persists between words; `pickColor` tries `colorIdx`, then `colorIdx + 1`, and so on. |
 | 2 | A colour may overlap itself **only once per word**. Each highlight may be crossed by at most one other highlight of its own colour. | `colorAllowed`: reject if the new word would cross 2 or more same-colour words, or if the one same-colour word it crosses already has a same-colour crossing. |
 | 3 | If two words **share letters and lie on the same straight line** (one nested in the other, or overlapping end to end), the new word must use a different colour. | Reject the colour if any same-colour overlapping word is `collinear`, meaning a parallel or opposite `dir`. Collinear and overlapping together means the same line. |
 | 4 | A highlight may cross several colours, but **if it crosses 2 or more highlights and one of them is the current colour, switch**. | Reject the colour if `overlapping.length >= 2` and any of them has that colour. |
@@ -357,6 +357,7 @@ These are product decisions, made deliberately with the product owner. Keep them
 | Maximum-overlap placement | Without it, only about 10% of words crossed and most boards stayed one colour; with it, most boards use 4–6 colours. |
 | Words inside words allowed | The owner considers hidden nested words part of the fun. |
 | Colour Rules 1–4 as in §6 | Owner-specified. Rule 2 is per word, not per board; Rule 4 is kept even though it partly overlaps Rule 2. |
+| First highlight colour is random each round | Owner request, so boards don't always start yellow. The switching order still follows the fixed sequence from there. |
 | Overlap = bars touching (geometric), not shared letters | Diagonal X crossings with no shared letter must count; the owner reported a KOALA highlight that should have switched colour. |
 | Highlight opacity 0.5 with multiply | Overlaps must stay visible and mix into new colours. |
 | Word list alphabetical; Puzzles list alphabetical | Owner request. |

@@ -20,7 +20,7 @@ The owner made these deliberately. Ask before changing any of them; the reasons 
 
 1. **Board:** a 10×10 grid with 20 words per board, placed with **maximum overlap**.
 2. **Nesting:** words hidden inside other words (SKI in SKIING) are allowed.
-3. **Highlight colours:** six neon colours in a fixed order, yellow → green → orange → blue → purple → pink. Colour **Rules 1–4** decide switching (`colorAllowed`); keep their behaviour exactly.
+3. **Highlight colours:** six neon colours in a fixed order, yellow → green → orange → blue → purple → pink. Each round starts on a random one. Colour **Rules 1–4** decide switching (`colorAllowed`); keep their behaviour exactly.
 4. **Overlap:** means the highlight *bars* touch, tested geometrically in `overlaps()`. The bar width (`stroke-width` 0.7) must stay **below 0.707** or the test stops matching what players see.
 5. **Highlight look:** `opacity: 0.5` with `mix-blend-mode: multiply` on a **light** board, so overlaps mix colours.
 6. **Order:** the word list and the Puzzles list are alphabetical.

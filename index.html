@@ -906,7 +906,7 @@
     grid = p.grid;
     words = p.words;
     found = [];
-    colorIdx = 0;
+    colorIdx = Math.floor(Math.random() * COLORS.length); // each round starts on a random highlight colour
     themeEl.textContent = "Theme: " + theme;
     statusEl.textContent = "Swipe across letters to find words. Tap a word below to learn about it.";
     statusEl.className = "status";
