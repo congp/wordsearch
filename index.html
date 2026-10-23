@@ -388,7 +388,7 @@
 </dialog>
 
 <!-- Bump ?v= whenever words-info.js changes, so browsers fetch the new descriptions instead of a cached copy. -->
-<script src="words-info.js?v=11"></script>
+<script src="words-info.js?v=13"></script>
 <script>
 (() => {
   const SIZE = 10;
@@ -594,6 +594,38 @@
              "RAZZMATAZZ", "SKEDADDLE", "SMOOCH", "SNAZZY", "SNOG", "SPLAT", "TOSH", "TWADDLE", "TWERP",
              "WALLY", "WHATSIT", "WIDGET", "WOBBLY", "WONKY", "YIKES", "YONKS", "ZANY", "ZIGZAG",
              "ZILCH"],
+    "Ted Lasso": ["AFC", "APPLE", "BEARD", "BELIEVE", "BISCUITS", "COACH", "COLIN", "CURIOUS", "DANI",
+             "DARTS", "EMMY", "FOOTBALL", "GOLDFISH", "GREYHOUNDS", "HIGGINS", "HOPE", "ISAAC", "JAMIE",
+             "KANSAS", "KEELY", "KENT", "LASSO", "LESLIE", "LONDON", "MAE", "MOUSTACHE", "NATE",
+             "NIGERIA", "OBISANYA", "REBECCA", "RELEGATION", "RICHMOND", "ROY", "RUPERT", "SAM",
+             "SHARON", "SUDEIKIS", "TARTT", "TEA", "TED", "TRENT", "WELTON", "WESTHAM", "WICHITA",
+             "ZAVA"],
+    "Disney Villains": ["APPLE", "CHERNABOG", "CLAYTON", "CRUELLA", "CURSE", "EDGAR", "EVILQUEEN", "FACILIER",
+             "FLOTSAM", "FROLLO", "GASTON", "GOTHEL", "HADES", "HANS", "HOOK", "HYENAS", "IAGO",
+             "JAFAR", "JETSAM", "KAA", "LEFOU", "LOTSO", "MALEFICENT", "MIM", "MIRROR", "MUNTZ", "PAIN",
+             "PANIC", "PETE", "POISON", "PRINCEJOHN", "RANDALL", "RATCLIFFE", "SCAR", "SHANYU",
+             "SHENZI", "SHEREKHAN", "SID", "SMEE", "SPINDLE", "SYNDROME", "TAMATOA", "TICKTOCK",
+             "TREMAINE", "URSULA", "VILLAIN", "YZMA", "ZURG"],
+    "Anime Classics": ["AKIRA", "ANIME", "ASTROBOY", "BEBOP", "CALCIFER", "CATBUS", "CHIHIRO", "COSPLAY",
+             "DEATHNOTE", "DRAGONBALL", "EREN", "EVANGELION", "GHIBLI", "GOKU", "GUNDAM", "HOKAGE",
+             "HOWL", "INUYASHA", "KAKASHI", "KIKI", "LIGHT", "LUFFY", "MANGA", "MECHA", "MIKASA",
+             "MIYAZAKI", "MONONOKE", "NARUTO", "NAUSICAA", "NEZUKO", "NOFACE", "ONEPIECE", "OTAKU",
+             "PONYO", "RYUK", "SAILORMOON", "SAITAMA", "SASUKE", "SHINJI", "SHOJO", "SHONEN", "SPIKE",
+             "TANJIRO", "TEZUKA", "TITAN", "TOTORO", "VEGETA", "ZORO"],
+    "Friends": ["BEN", "BING", "BREAK", "BUFFAY", "CAROL", "CHANDLER", "CHICK", "COUCH", "DRAKE", "DUCK",
+             "EMILY", "EMMA", "ESTELLE", "FOOSBALL", "GELLER", "GUNTHER", "HECKLES", "HUGSY", "JANICE",
+             "JOEY", "LOBSTER", "LONDON", "MANHATTAN", "MARCEL", "MIKE", "MONICA", "PAOLO", "PHOEBE",
+             "PIVOT", "RACHEL", "RAMORAY", "RECLINER", "REMBRANDTS", "RICHARD", "ROSS", "SITCOM",
+             "SMELLYCAT", "SUSAN", "TAG", "TREEGER", "TRIBBIANI", "TRIFLE", "TURKEY", "UNAGI", "URSULA",
+             "VEGAS"],
+    "Harry Potter": ["ACCIO", "ALOHOMORA", "AZKABAN", "BELLATRIX", "BROOM", "BUTTERBEER", "CLOAK", "CUP",
+             "DEMENTOR", "DIAGON", "DOBBY", "DRACO", "DUMBLEDORE", "DURSLEY", "ELF", "FANG", "FAWKES",
+             "GHOST", "GINNY", "GRANGER", "GRINGOTTS", "GRYFFINDOR", "HAGRID", "HARRY", "HEDWIG",
+             "HERMIONE", "HOGSMEADE", "HOGWARTS", "HORCRUX", "HOUSE", "HUFFLEPUFF", "KINGSCROSS",
+             "LUMOS", "LUNA", "LUPIN", "MAP", "MCGONAGALL", "MUGGLE", "NEVILLE", "NIMBUS", "NOX", "OWL",
+             "PATRONUS", "PENSIEVE", "POLYJUICE", "POTION", "PRIVET", "QUIDDITCH", "QUILL", "RAT",
+             "RAVENCLAW", "RON", "ROWLING", "SCAR", "SIRIUS", "SLYTHERIN", "SNAPE", "SNITCH",
+             "SORTINGHAT", "SPELL", "TOAD", "TROLL", "VOLDEMORT", "WAND", "WEASLEY"],
   };
   // Puzzle categories, in the order shown in the Puzzles list. Every puzzle
   // in THEMES belongs to exactly one category (any that don't show under
@@ -601,7 +633,8 @@
   // them casually.
   const CATEGORIES = [
     { name: "Pop Culture", puzzles: ["The Office: Characters", "The Office: Dunder Mifflin", "The Office: Moments",
-                                     "The Office: Surnames"] },
+                                     "The Office: Surnames", "Ted Lasso", "Disney Villains", "Anime Classics",
+                                     "Friends", "Harry Potter"] },
     { name: "Food & Drink", puzzles: ["Fruits", "Food Around the World", "Coffee Culture", "Desserts",
                                      "Cooking Techniques", "Street Food"] },
     { name: "Art & Lifestyle", puzzles: ["Tiny Luxuries", "Art History", "Colour Theory", "Interior Design", "Cottagecore"] },

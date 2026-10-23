@@ -89,7 +89,15 @@ A **found-word entry** looks like this:
 - **Accented words lose their accents in the grid** (PHỞ → PHO, ÁO DÀI → AODAI, gemütlich → GEMUTLICH), and multi-word names are joined. The paragraph gives the proper spelling.
 - **Keep the average word length around 6 letters.** Puzzles of long words can't fit 20 on a 10×10 grid; add short entries to compensate.
 
-The Puzzles list sorts puzzles alphabetically by name. The word chips under the grid are alphabetical because `generate()` sorts `words`.
+**Categories.** `CATEGORIES` is an ordered list of `{ name, puzzles: [...] }`. Every puzzle in `THEMES` must appear in exactly one category; any that don't show under "Other". `categoryOf(name)` looks a puzzle's category up. There are 8 categories: Pop Culture, Food & Drink, Art & Lifestyle, Science & Discovery, Nature, Travel, Play & Adventure, Mind & Language. Category names are sent to analytics, so don't rename them casually.
+
+**The Puzzles list** (`renderList`):
+- **Layout:** one section per category, in `CATEGORIES` order. Each has a heading and an "N of M completed" count, with its puzzles sorted alphabetically.
+- **Filter:** a sideways-scrolling row of chips at the top: "All", then one per category, each with its puzzle count. The chosen filter is saved in `wordsearch-list-filter`.
+- **Cards:** each card folds its word list behind a "N words" toggle (`<details>`).
+- **Opening the list:** it scrolls to the current puzzle.
+
+The word chips under the grid are alphabetical because `generate()` sorts `words`.
 
 ## 4. Board generation
 
@@ -278,6 +286,7 @@ Every read and write is wrapped in `try/catch`, and the game works fine without 
 | `wordsearch-in-order` | `"1"` / `"0"` | In order switch |
 | `wordsearch-crazy` | `"1"` / `"0"` | Crazy switch |
 | `wordsearch-crazy-secs` | `"10"` … `"60"` | Seconds select |
+| `wordsearch-list-filter` | a category name, or `"All"` | Puzzles list filter |
 | `wordsearch-stats` | JSON, see §9 | `recordWin` |
 | `umami.disabled` | `"1"` when set | `?analytics=off` (owner opt-out, §17). This is Umami's own key. |
 
@@ -286,7 +295,7 @@ If you change the stats schema, migrate the old data or start a new key. Don't s
 ## 13. Common changes
 
 **Add or edit a puzzle**
-1. Add the word list to `THEMES` (A–Z, 2–10 letters, at least about 30 words).
+1. Add the word list to `THEMES` (A–Z, 2–10 letters, at least about 30 words), and add the puzzle's name to one category in `CATEGORIES`.
 2. Add a paragraph for **every** word to `words-info.js` under the same puzzle name.
 3. **Bump the version** in `<script src="words-info.js?v=N">` in `index.html`. Otherwise returning players' browsers may keep the old cached file and show "No description yet" for the new words.
 4. Run the coverage check and the fit check (§14). Aim for 20 words placed in about 100% of boards.
@@ -363,7 +372,7 @@ The game sends anonymous, cookie-free gameplay events to Umami Cloud. **The full
 
 - **Script:** the Umami script in `<head>` only reports from `congph.com` (`data-domains`), so localhost never sends data.
 - **Sending:** all events go through `track(name, data)`. It's guarded, so a blocked or failed script never affects play. `?debug-analytics` logs each call to the console.
-- **Nine events,** about 2–5 per board: `game_started` (first swipe), then exactly one ending (`game_completed`, `game_abandoned` or `crazy_timeout`), plus toggles, word cards and the Puzzles list.
+- **Ten events,** about 2–5 per board: `game_started` (first swipe), then exactly one ending (`game_completed`, `game_abandoned` or `crazy_timeout`), plus toggles, word cards, and the Puzzles list and its filter.
   - `boardSource` / `boardStarted` track each board's lifecycle.
   - `newGame(theme, source)` takes the source (`load`, `new`, `list`, `replay`, `crazy_reset`; `resume` after a back/forward-cache restore).
 - **Treat event names and fields like saved data:** renaming or removing them breaks the dashboards and history.

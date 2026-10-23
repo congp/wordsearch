@@ -206,14 +206,20 @@ There's **no spare room**. Anything new on the main screen has to replace someth
 - **Position:** it sits after the chips, so on short screens it's just below the fold when the word list wraps to 7 rows. That's fine for a footnote: it never pushes the board or chips.
 
 ### Puzzles list (dialog)
-- **Frame:** a modal sheet on the paper background, at most 560 px wide. It has a sticky header with the "Puzzles" title and a Close button.
+- **Frame:** a modal sheet on the paper background, at most 560 px wide.
+- **Sticky header:** the "Puzzles" title, a Close button, and the filter row underneath.
+- **Filter row:** one row of pill chips that scrolls sideways (no scrollbar): "All", then each category, each with a faded count ("Food & Drink 6").
+  - **Selected chip:** filled ink with white text.
+  - **Other chips:** white with a hairline border.
+  - **Memory:** the chosen filter is remembered.
+- **Category sections:** a small upper-case muted heading (0.78rem, letter-spacing 0.08em, like "GAME MODES"), with "N of M completed" on the right, then that category's cards.
 - **Puzzle card:** white and rounded, showing:
-  - the name and "· N words";
+  - the name;
   - a Play button, which reads "Replay" for the current puzzle;
-  - the full word list as muted preview text.
-- **Current puzzle:** a 2 px ink border.
+  - a folded "▸ N words" toggle that reveals the full word list as muted text.
+- **Current puzzle:** a 2 px ink border, and the list opens scrolled to it.
 - **Completed puzzle:** a records line, "✓ Completed ×N" in green plus "Best: 1:58 Normal · 2:40 Crazy". There's one time per mode combination played.
-- **Order and closing:** cards are sorted alphabetically. Tapping the backdrop closes the dialog.
+- **Order and closing:** categories follow their set order; cards within a category are alphabetical. Tapping the backdrop closes the dialog.
 
 ### Word card (dialog)
 - **Frame:** a compact modal, at most 420 px wide.
@@ -292,6 +298,7 @@ The voice is short, friendly and plain. There's one emoji per moment at most, sa
 | Mode suffix | (In order), (Crazy), (In order + Crazy) |
 | Puzzles list record | ✓ Completed ×3 · Best: 1:58 Normal |
 | Word card with no text | No description yet for this word. |
+| Category progress | 2 of 6 completed |
 | Analytics footnote | This game uses anonymous, cookie-free analytics (Umami). No personal data is collected. |
 
 **Word card paragraphs** are one or two plain, factual sentences, about 15–40 words, in British-leaning spelling ("colour", "favourite") to match the rest of the copy.

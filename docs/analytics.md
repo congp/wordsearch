@@ -46,6 +46,7 @@ Values used in event details:
 | Field | Values |
 |---|---|
 | `puzzle` | Puzzle name exactly as in `THEMES`, for example `Ocean`, `The Office: Characters` |
+| `category` | The puzzle's category, as in `CATEGORIES`, for example `Food & Drink` |
 | `modes` | `normal`, `order`, `crazy`, `order+crazy`: the same keys as the personal-best records (`modeKey`) |
 | `source` | How the board appeared: `load` (opening the page), `new` (New button), `list` (picking from the Puzzles list), `replay` (Replay in the list), `crazy_reset` (crazy timer ran out), `resume` (the page was closed mid-game, then restored by the browser's back/forward cache) |
 | `seconds` | Whole seconds, rounded |
@@ -55,8 +56,8 @@ Values used in event details:
 
 | Event | When it fires | Details | Answers |
 |---|---|---|---|
-| `game_started` | First swipe on a new board. Boards nobody touched don't count. | `puzzle`, `modes`, `source` | Q3: which puzzles get played; Q2: how people start games |
-| `game_completed` | Last word found | `puzzle`, `modes`, `seconds`, `first_finish` (yes/no), `new_best` (yes/no) | Q3: completions and finish times; Q2: improvement over time |
+| `game_started` | First swipe on a new board. Boards nobody touched don't count. | `puzzle`, `category`, `modes`, `source` | Q3: which puzzles get played; Q2: how people start games |
+| `game_completed` | Last word found | `puzzle`, `category`, `modes`, `seconds`, `first_finish` (yes/no), `new_best` (yes/no) | Q3: completions and finish times; Q2: improvement over time |
 | `game_abandoned` | A started, unfinished board is replaced (New, picking a puzzle, Replay), **or the page is closed or left mid-game** | `puzzle`, `modes`, `found`, `total`, `seconds`, `closed` (yes = page closed or left; no = replaced in-game) | Q2: where and when people give up |
 | `crazy_timeout` | Crazy timer runs out | `puzzle`, `found`, `total`, `crazy_seconds` (10–60) | Q2: whether the timer is too harsh |
 | `mode_toggled` | In order or Crazy switched | `mode` (`order`/`crazy`), `on` (yes/no) | Q2: how popular each mode is |
@@ -64,6 +65,7 @@ Values used in event details:
 | `music_toggled` | Music button tapped | `on` (yes/no) | Q2: whether people want music |
 | `word_card_opened` | A word chip tapped | `puzzle`, `word`, `found` (yes/no) | Q2: whether the paragraphs get read, and which words interest people |
 | `puzzles_list_opened` | Puzzles button tapped | – | Q2: how people choose puzzles |
+| `puzzles_filter_changed` | A category chip tapped in the Puzzles list | `category` (or `All`) | Q3: which categories people browse |
 
 **How they relate:**
 - **Every `game_started` ends exactly one way:** `game_completed`, `game_abandoned`, or `crazy_timeout`. A crazy reset then starts a new board with `source: crazy_reset`.
@@ -113,6 +115,7 @@ All in `index.html`, with no build step and no new files.
   | `music_toggled` | the music button's click handler only (not the automatic restart of a saved "on") |
   | `word_card_opened` | the word-chip click handler |
   | `puzzles_list_opened` | the Puzzles button handler |
+  | `puzzles_filter_changed` | the filter row's click handler |
 
 - **Debug mode:** add `?debug-analytics` to the URL to log every `track()` call to the console. It works on localhost, where nothing is sent.
 - **Opting out (the owner's own devices):** open `congph.com/wordsearch/?analytics=off` once in each browser you use. That sets Umami's own `umami.disabled` flag in the browser's storage, and Umami then sends nothing from that browser. `?analytics=on` removes it. Clearing the browser's site data removes it too.
