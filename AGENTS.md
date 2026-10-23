@@ -10,6 +10,7 @@ This is a single-page, mobile-first word search game. Read `README.md` first, th
 - **No build step and no dependencies.** It's plain HTML, CSS and JS in `index.html`, plus the `words-info.js` data file. Don't add frameworks, bundlers or packages without asking the owner.
 - **Match the existing code style:** an IIFE, `const`/`let`, small named functions, short comments that explain *why*. Everything stays inside the IIFE; nothing becomes global except `window.WORD_INFO`.
 - **Wrap every `localStorage` access in `try/catch`.** The game must work with no storage at all.
+- **Pushing to `main` deploys to the live site** (congph.com/wordsearch/) through GitHub Pages. Don't push or merge to `main` without the owner's OK.
 - **Don't break saved data.** If you change any `wordsearch-*` key or the stats JSON shape, migrate the old data.
 
 ## Product decisions to keep

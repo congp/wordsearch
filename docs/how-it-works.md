@@ -291,7 +291,7 @@ If you change the stats schema, migrate the old data or start a new key. Don't s
 
 ## 14. Testing and verifying
 
-There's no automated test suite. Changes are verified in a real browser at phone size (375 × 812) by driving the game from the browser console. These snippets assume the page is loaded at `http://localhost:8000/wordsearch/`.
+There's no automated test suite. Changes are verified in a real browser at phone size (375 × 812) by driving the game from the browser console. These snippets assume the page is loaded at `http://localhost:8000/` (see "Run it locally" in `README.md`). They also work on the live site.
 
 **Solve the current board.** This finds each word in the grid and fires a real pointer swipe:
 
