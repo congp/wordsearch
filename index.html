@@ -388,7 +388,7 @@
 </dialog>
 
 <!-- Bump ?v= whenever words-info.js changes, so browsers fetch the new descriptions instead of a cached copy. -->
-<script src="words-info.js?v=9"></script>
+<script src="words-info.js?v=11"></script>
 <script>
 (() => {
   const SIZE = 10;
@@ -572,6 +572,28 @@
              "LOCK", "LOOT", "MAP", "PARROT", "PEARL", "PHARAOH", "PIRATE", "PLUNDER", "QUEST",
              "RIDDLE", "RUBY", "SCROLL", "SHIPWRECK", "SHOVEL", "SPADE", "SPYGLASS", "SUTTONHOO",
              "TOMB", "TORCH", "TRAIL", "TREASURE"],
+    "Beautifully Specific Words": ["APRICITY", "AURORA", "AZURE", "BLOOM", "BRUME", "DAPPLE", "DAWN", "DEWY", "DUMBLEDORE",
+             "DUSK", "ECHO", "EMBER", "EPHEMERAL", "ETHEREAL", "FIRN", "GLEAM", "GLINT", "GLOAMING",
+             "GLOW", "GOSSAMER", "HALCYON", "HAVEN", "HUSH", "KITH", "LACUNA", "LAMBENT", "LANGUOR",
+             "LILT", "LIMERENCE", "LULL", "MOONBOW", "MOTE", "MURMUR", "NADIR", "NOCTURNE", "OPAL",
+             "PETRICHOR", "PHOSPHENE", "PLUVIAL", "QUIXOTIC", "REVERIE", "RIPPLE", "SHEEN", "SHIMMER",
+             "SILHOUETTE", "SKERRY", "SNOWBLINK", "SOLACE", "SONOROUS", "SUNDOG", "SUSURRUS", "SWOON",
+             "VESPER", "WAFT", "WISP", "ZEPHYR"],
+    "Cognitive Biases": ["ANCHORING", "ASCH", "AVERSION", "BANDWAGON", "BARNUM", "BIAS", "BLINDSPOT", "BUBBLE",
+             "CONFIRM", "CURSE", "DECOY", "DEFAULT", "DUNNING", "ECHO", "EGO", "ENDOWMENT", "FAD",
+             "FALLACY", "FOCUS", "FRAMING", "GAMBLER", "GOOGLE", "GROUPTHINK", "GUT", "HALO", "HERD",
+             "HINDSIGHT", "HOTHAND", "IKEA", "INGROUP", "LOSS", "MERE", "MOOD", "MYSIDE", "NOISE",
+             "NUDGE", "OPTIMISM", "OSTRICH", "PEAKEND", "PLACEBO", "PLANNING", "PRIMACY", "PRIMING",
+             "RECENCY", "RISK", "SCARCITY", "SPOTLIGHT", "STATUSQUO", "SUNKCOST", "SYSTEM", "TRUTH",
+             "ZEIGARNIK"],
+    "Funny Words": ["BALDERDASH", "BAMBOOZLE", "BLATHER", "BLIMEY", "BONKERS", "BOSH", "BUMFUZZLE", "BUNKUM",
+             "BUPKIS", "CANOODLE", "CHUFFED", "CODSWALLOP", "DINGBAT", "DOODLE", "DOOZY", "DORK",
+             "DWEEB", "FAFF", "FLUB", "FLUMMOX", "GAGA", "GIZMO", "GOBSMACKED", "GOOF", "GUBBINS",
+             "GUFF", "HOKUM", "HOOHA", "HUBBUB", "HULLABALOO", "KAPUT", "KAZOO", "KERFUFFLE", "KOOKY",
+             "LOLLYGAG", "NERD", "NINCOMPOOP", "NOGGIN", "NUMPTY", "OOMPH", "PIFFLE", "POPPYCOCK",
+             "RAZZMATAZZ", "SKEDADDLE", "SMOOCH", "SNAZZY", "SNOG", "SPLAT", "TOSH", "TWADDLE", "TWERP",
+             "WALLY", "WHATSIT", "WIDGET", "WOBBLY", "WONKY", "YIKES", "YONKS", "ZANY", "ZIGZAG",
+             "ZILCH"],
   };
   // Puzzle categories, in the order shown in the Puzzles list. Every puzzle
   // in THEMES belongs to exactly one category (any that don't show under
@@ -589,7 +611,8 @@
     { name: "Travel", puzzles: ["Around the World: Vietnam"] },
     { name: "Play & Adventure", puzzles: ["Sports", "Theme-Park Rides", "Retro Gaming", "Pokémon",
                                      "Mythical Creatures", "Treasure Hunts"] },
-    { name: "Mind & Language", puzzles: ["Name That Feeling", "Untranslatable Words"] },
+    { name: "Mind & Language", puzzles: ["Name That Feeling", "Untranslatable Words", "Beautifully Specific Words",
+                                     "Cognitive Biases", "Funny Words"] },
   ];
   const categoryOf = (name) => (CATEGORIES.find((c) => c.puzzles.includes(name)) || { name: "Other" }).name;
 
