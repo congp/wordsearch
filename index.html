@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#1f2a44">
+<title>Word Search</title>
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --panel: #ffffff;
+    --ink: #1f2a44;
+    --muted: #8a8f9c;
+    --line: #e3dfd5;
+    --select: rgba(80, 140, 255, 0.3);
+    --accent: #1f2a44;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  main {
+    width: 100%;
+    max-width: 560px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  h1 { margin: 0; font-size: 1.4rem; letter-spacing: 0.02em; }
+  .theme { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+  .actions { display: flex; gap: 8px; }
+  button {
+    font: inherit;
+    font-weight: 600;
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 16px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+  button.secondary { background: var(--panel); color: var(--ink); border: 1px solid var(--line); }
+  h1 { white-space: nowrap; }
+  @media (max-width: 400px) {
+    h1 { font-size: 1.2rem; }
+    header { gap: 8px; }
+    .actions { gap: 6px; }
+    .actions button:not(.icon) { padding: 10px 13px; }
+  }
+  button.icon { padding: 0; width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  button.icon[aria-pressed="false"] { color: var(--muted); }
+  button.icon[aria-pressed="true"] .slash { display: none; }
+  button:active { transform: scale(0.97); }
+
+  .board {
+    position: relative;
+    background: var(--panel);
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(31, 42, 68, 0.08);
+    padding: 8px;
+    touch-action: none;          /* stop the page scrolling while swiping */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .board-inner { position: relative; aspect-ratio: 1; }
+  .board svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .grid { position: absolute; inset: 0; display: grid; }
+  .cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: clamp(14px, 5.2vw, 26px);
+    position: relative;
+    z-index: 1;
+  }
+  .pill-found { opacity: 0.5; mix-blend-mode: multiply; }
+  .pill-select { stroke: var(--select); }
+
+  .words {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .words li { cursor: pointer; }
+  .words li:active { transform: scale(0.96); }
+  .words li {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: background 0.2s, color 0.2s;
+  }
+  .words li.found {
+    border-color: transparent;
+    text-decoration: line-through;
+    color: rgba(31, 42, 68, 0.7);
+  }
+  .words li.next { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+  .words li.nope { animation: nope 0.35s; }
+  @keyframes nope {
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .mode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .mode input {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    width: 40px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--line);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex: none;
+  }
+  .mode input::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+  }
+  .mode input:checked { background: var(--accent); }
+  .mode input:checked::after { transform: translateX(16px); }
+  .mode strong { color: var(--ink); }
+  .modes-box {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 8px 14px 10px;
+  }
+  .modes-box h2 {
+    margin: 0 0 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+  }
+  .modes { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 28px; }
+  .mode select {
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 3px 6px;
+  }
+
+  /* Crazy-mode countdown: a thin bar in the board's bottom padding */
+  .timer {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 2px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line);
+    overflow: hidden;
+    display: none;
+  }
+  .crazy .timer { display: block; }
+  .timer-fill {
+    height: 100%;
+    background: var(--accent);
+    transform-origin: left;
+  }
+  .timer.urgent .timer-fill { background: #ff3b30; }
+  .clock { font-variant-numeric: tabular-nums; }
+  .clock:not(:empty)::before { content: " · "; }
+  .clock.urgent { color: #ff3b30; font-weight: 700; }
+  .board.timeup { animation: timeup 0.6s; }
+  @keyframes timeup {
+    0%, 100% { box-shadow: 0 2px 12px rgba(31, 42, 68, 0.08); transform: none; }
+    15% { box-shadow: 0 0 0 4px #ff3b30; transform: translateX(-6px); }
+    35% { transform: translateX(6px); }
+    55% { transform: translateX(-4px); box-shadow: 0 0 0 4px #ff3b30; }
+    75% { transform: translateX(3px); }
+  }
+  .status { text-align: center; color: var(--muted); min-height: 1.4em; margin: 0; }
+  .status.win { color: var(--ink); font-weight: 700; font-size: 1.1rem; }
+
+  /* Puzzle list */
+  dialog {
+    border: 0;
+    border-radius: 18px;
+    padding: 0;
+    width: min(560px, calc(100% - 32px));
+    max-height: calc(100% - 48px);
+    background: var(--bg);
+    color: var(--ink);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  }
+  dialog::backdrop { background: rgba(31, 42, 68, 0.45); }
+  .dlg-head {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .dlg-head h2 { margin: 0; font-size: 1.15rem; }
+  .puzzle-list { list-style: none; margin: 0; padding: 12px 16px 16px; display: grid; gap: 12px; }
+  .puzzle {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 14px;
+    border: 2px solid transparent;
+  }
+  .puzzle.current { border-color: var(--accent); }
+  .puzzle-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .puzzle h3 { margin: 0; font-size: 1rem; }
+  .puzzle .count { color: var(--muted); font-size: 0.85rem; font-weight: 500; }
+  .puzzle .record { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; font-size: 0.85rem; }
+  .puzzle .tick { color: #1f8a43; font-weight: 700; }
+  .puzzle .bests { color: var(--ink); display: flex; flex-wrap: wrap; gap: 2px 10px; }
+  .puzzle .bests b { font-variant-numeric: tabular-nums; }
+  .puzzle button { padding: 7px 14px; font-size: 0.9rem; }
+  .puzzle p { margin: 10px 0 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; letter-spacing: 0.03em; }
+  /* Word info card */
+  dialog.info { width: min(420px, calc(100% - 32px)); overflow: hidden; }
+  .info-band { height: 10px; background: var(--line); }
+  .info-body { padding: 18px 20px 20px; }
+  .info-theme { margin: 0; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; }
+  .info-body h2 { margin: 4px 0 10px; font-size: 1.5rem; letter-spacing: 0.06em; }
+  .info-text { margin: 0 0 18px; line-height: 1.55; font-size: 1rem; }
+  .info-body button { width: 100%; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Word Search</h1>
+      <div class="theme" id="theme"></div>
+    </div>
+    <div class="actions">
+      <button class="secondary icon" id="sound" aria-label="Music" aria-pressed="false" title="Music">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>
+          <path class="slash" d="M3 3l18 18"/>
+        </svg>
+      </button>
+      <button class="secondary" id="openList">Puzzles</button>
+      <button id="newGame">New</button>
+    </div>
+  </header>
+
+  <div class="board" id="board">
+    <div class="timer" id="timer"><div class="timer-fill" id="timerFill"></div></div>
+    <div class="board-inner">
+      <svg id="overlay" preserveAspectRatio="none"></svg>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <p class="status"><span id="status">Swipe across letters to find words. Tap a word below to learn about it.</span><span class="clock" id="clock"></span></p>
+  <section class="modes-box" aria-labelledby="modesTitle">
+    <h2 id="modesTitle">Game modes</h2>
+    <div class="modes">
+      <label class="mode" title="Find the words in alphabetical order">
+        <input type="checkbox" id="inOrder">
+        <span><strong>In order</strong></span>
+      </label>
+      <div class="mode">
+        <label class="mode" title="Find a word before the timer runs out, or the board resets">
+          <input type="checkbox" id="crazy">
+          <span><strong>Crazy</strong></span>
+        </label>
+        <select id="crazySecs" aria-label="Seconds per word">
+          <option value="10">10s</option>
+          <option value="15">15s</option>
+          <option value="20">20s</option>
+          <option value="30">30s</option>
+          <option value="45">45s</option>
+          <option value="60">60s</option>
+        </select>
+      </div>
+    </div>
+  </section>
+  <ul class="words" id="words"></ul>
+</main>
+
+<dialog id="infoDlg" class="info" aria-labelledby="infoWord">
+  <div class="info-band" id="infoBand"></div>
+  <div class="info-body">
+    <p class="info-theme" id="infoTheme"></p>
+    <h2 id="infoWord"></h2>
+    <p class="info-text" id="infoText"></p>
+    <button id="infoClose">Close</button>
+  </div>
+</dialog>
+
+<dialog id="listDlg">
+  <div class="dlg-head">
+    <h2>Puzzles</h2>
+    <button class="secondary" id="closeList">Close</button>
+  </div>
+  <ul class="puzzle-list" id="puzzleList"></ul>
+</dialog>
+
+<script src="words-info.js"></script>
+<script>
+(() => {
+  const SIZE = 10;
+  const WORDS_PER_GAME = 20;
+  // Each theme is a word pool; every game draws WORDS_PER_GAME of them at random.
+  // Words must be ≤ SIZE letters, A–Z only. Words hidden inside other words
+  // (SKI in SKIING) are allowed — the placer will happily nest them.
+  const THEMES = {
+    Animals: ["BADGER", "BAT", "BEAR", "BISON", "CAMEL", "CAT", "COW", "DEER", "DOG", "DUCK", "EAGLE",
+              "ELK", "EMU", "FALCON", "FOX", "FROG", "GECKO", "GIRAFFE", "GOAT", "HARE", "HIPPO", "HORSE",
+              "JAGUAR", "KOALA", "LION", "LLAMA", "MOLE", "MONKEY", "MOUSE", "MULE", "OTTER", "OWL", "PANDA",
+              "PIG", "RABBIT", "SEAL", "SHEEP", "SNAKE", "TIGER", "TOAD", "WALRUS", "WOLF", "YAK", "ZEBRA"],
+    Fruits: ["APPLE", "APRICOT", "BANANA", "BERRY", "CHERRY", "CITRON", "COCONUT", "CURRANT", "DAMSON",
+             "DATE", "DURIAN", "FEIJOA", "FIG", "GRAPE", "GUAVA", "KIWI", "KUMQUAT", "LEMON", "LIME",
+             "LONGAN", "LYCHEE", "MANGO", "MEDLAR", "MELON", "OLIVE", "ORANGE", "PAPAYA", "PEACH", "PEAR",
+             "PLUM", "POMELO", "PRUNE", "QUINCE", "RAISIN", "SLOE", "TANGELO", "YUZU"],
+    Ocean: ["ANCHOR", "BAY", "CLAM", "COD", "CORAL", "CRAB", "CURRENT", "DEPTH", "DOLPHIN", "EEL", "FISH",
+            "FOAM", "KELP", "LAGOON", "LOBSTER", "MARLIN", "MUSSEL", "OCTOPUS", "OYSTER", "PLANKTON", "PRAWN",
+            "RAY", "REEF", "SALT", "SAND", "SEA", "SEAL", "SEAWEED", "SHARK", "SHELL", "SHRIMP", "SQUID",
+            "SURF", "TIDE", "TURTLE", "URCHIN", "WAVE", "WHALE"],
+    Space: ["ALIEN", "ASTEROID", "COMET", "COSMOS", "CRATER", "DUST", "EARTH", "ECLIPSE", "GALAXY", "GAS",
+            "JUPITER", "LUNAR", "MARS", "MERCURY", "METEOR", "MOON", "NEBULA", "NEPTUNE", "NOVA", "ORB",
+            "ORBIT", "PLANET", "PLUTO", "PULSAR", "QUASAR", "RAY", "RING", "ROCKET", "SATURN", "SKY", "SOLAR",
+            "SPACE", "STAR", "SUN", "URANUS", "VENUS", "VOID", "ZENITH"],
+    Sports: ["ARCHERY", "BALL", "BASEBALL", "BIKE", "BOWLING", "BOXING", "CHESS", "CRICKET", "CYCLING",
+             "DART", "DARTS", "DIVING", "FENCING", "GOAL", "GOLF", "HOCKEY", "JUDO", "KARATE", "KAYAK",
+             "LACROSSE", "NET", "NETBALL", "POLO", "RACE", "RELAY", "ROWING", "RUGBY", "RUN", "SAILING",
+             "SKI", "SKIING", "SOCCER", "SPRINT", "SQUASH", "SURF", "SURFING", "SWIM", "TEAM", "TENNIS",
+             "TRACK"],
+    "The Office: Characters": ["ANDY", "ANGELA", "CLARK", "CREED", "DARRYL", "DAVID", "DEVON", "DWIGHT",
+             "ERIN", "GABE", "HANK", "HOLLY", "JAN", "JIM", "JO", "KAREN", "KELLY", "KEVIN", "MEREDITH",
+             "MICHAEL", "MOSE", "NATE", "NELLIE", "OSCAR", "PAM", "PETE", "PHYLLIS", "ROBERT", "ROY", "RYAN",
+             "STANLEY", "TOBY", "TODD", "VAL"],
+    "The Office: Surnames": ["ANDERSON", "BEESLY", "BENNETT", "BERNARD", "BERTRAM", "BRATTON", "CALIFORNIA",
+             "CORDRAY", "FILIPPELLI", "FLAX", "FLENDERSON", "GREEN", "HALPERT", "HANNON", "HOWARD",
+             "HUDSON", "KAPOOR", "LAPIN", "LEVINSON", "LEWIS", "MALONE", "MARTIN", "MARTINEZ",
+             "MILLER", "MINER", "NICKERSON", "PACKER", "PALMER", "PHILBIN", "SCHRUTE", "SCOTT",
+             "SIMMS", "TATE", "VANCE", "VICKERS", "WALLACE", "WHITE"],
+    "The Office: Dunder Mifflin": ["ACCOUNTING", "ANNEX", "BALER", "BOSS", "BRANCH", "BREAKROOM", "BUFFALO", "CALL",
+             "CHAIR", "CLIENT", "COPIER", "CORPORATE", "DEAL", "DESK", "DUNDER", "EMAIL", "FAX",
+             "FILE", "INK", "LOBBY", "MANAGER", "MEETING", "MEMO", "MIFFLIN", "NASHUA", "PAPER",
+             "PEN", "PHONE", "PITCH", "PRINTER", "PROFIT", "QUOTA", "RECEPTION", "SABRE", "SALES",
+             "SCRANTON", "STAMFORD", "STAPLER", "TAPE", "UTICA", "VENDING", "WAREHOUSE"],
+    "The Office: Moments": ["BABY", "BANDIT", "BEACH", "BEARS", "BEETS", "CAMERA", "CASINO", "CAT", "CHILI", "CPR",
+             "DINNER", "DIVERSITY", "DUNDIES", "FARM", "FIRE", "FIREDRILL", "FUNRUN", "GARBAGE",
+             "GOLDENFACE", "IMPROV", "JELLO", "KARATE", "KISS", "MIDNIGHT", "MUG", "NIAGARA",
+             "OLYMPICS", "PARKOUR", "PARTY", "PRANK", "PRETZEL", "PRISON", "ROAST", "ROOF", "SCARN",
+             "SPRINKLES", "TEAPOT", "TOTS", "WEDDING"],
+    Weather: ["BALMY", "BLIZZARD", "BREEZE", "CHILL", "CLOUD", "COLD", "CYCLONE", "DEW", "DRIZZLE",
+              "DROUGHT", "FLOOD", "FOG", "FOGGY", "FREEZE", "FROST", "GALE", "GUST", "HAIL", "HAZE", "HEAT",
+              "HUMID", "ICE", "MIST", "MONSOON", "RAIN", "RAINBOW", "SHOWER", "SLEET", "SNOW", "SQUALL",
+              "STORM", "SUN", "SUNNY", "THUNDER", "TORNADO", "TYPHOON", "WIND"],
+  };
+  const DIRS = [[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]];
+
+  // Neon highlight colours, used in this order.
+  const COLORS = [
+    { name: "yellow", hex: "#f2ff00" },
+    { name: "green",  hex: "#39ff14" },
+    { name: "orange", hex: "#ff9500" },
+    { name: "blue",   hex: "#00d5ff" },
+    { name: "purple", hex: "#c04dff" },
+    { name: "pink",   hex: "#ff2ec8" },
+  ];
+
+  // ---- Music & sounds ----
+  // Generative ambient music made live with Web Audio — no audio files. Every
+  // 8s a soft, slowly rolled chord swells in; every 4s a few random notes from
+  // a pentatonic scale drift over it, so it never repeats exactly. Everything
+  // runs through a warm lowpass filter and a long synthetic reverb. The game
+  // feeds it "energy" (how much of the board is found) and urgency (crazy-mode
+  // clock), and triggers chimes for game events.
+  const Sound = (() => {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    // Fmaj7 · Em7 · Dm7 · Cmaj7 · Am7 · Dm9 · Gsus · G  (bass note first)
+    const CHORDS = [[41, 57, 60, 64], [40, 55, 59, 62], [38, 53, 57, 60], [36, 55, 59, 64],
+                    [45, 55, 60, 64], [38, 57, 60, 64], [43, 55, 60, 62], [43, 55, 59, 62]];
+    const PENTA = [60, 62, 64, 67, 69, 72, 74, 76, 79, 81, 84]; // C major pentatonic
+    const VOLUME = 2.2;
+    const hz = (n) => 440 * Math.pow(2, (n - 69) / 12);
+    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    let ctx = null, master, filter, bus, timer = 0, step = 0;
+    let on = false, energy = 0, urgent = false;
+
+    function init() {
+      if (ctx || !AC) return !!ctx;
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {} // iOS: play with the silent switch on
+      ctx = new AC();
+      master = ctx.createGain();
+      master.gain.value = 0;
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.ratio.value = 3; comp.attack.value = 0.02; comp.release.value = 0.4;
+      filter = ctx.createBiquadFilter();
+      filter.type = "lowpass"; filter.frequency.value = 1700; filter.Q.value = 0.5;
+      // Reverb: a few seconds of fading stereo noise as the impulse response.
+      const verb = ctx.createConvolver(), len = ctx.sampleRate * 3.2, ir = ctx.createBuffer(2, len, ctx.sampleRate);
+      for (let c = 0; c < 2; c++) {
+        const d = ir.getChannelData(c);
+        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+      }
+      verb.buffer = ir;
+      const wet = ctx.createGain(), dry = ctx.createGain();
+      wet.gain.value = 0.5; dry.gain.value = 0.6;
+      bus = ctx.createGain();
+      bus.connect(filter);
+      filter.connect(dry); filter.connect(verb); verb.connect(wet);
+      dry.connect(master); wet.connect(master);
+      master.connect(comp); comp.connect(ctx.destination);
+      return true;
+    }
+
+    // One soft note: quick or slow attack, long exponential fade, plus a quiet
+    // octave partial for warmth. Slight random detune keeps it from sounding sterile.
+    function note(n, t, dur, vol, type = "sine", attack = 0.01, partial = 0.3) {
+      const o = ctx.createOscillator(), g = ctx.createGain(), detune = (Math.random() - 0.5) * 8;
+      o.type = type; o.frequency.value = hz(n); o.detune.value = detune;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(bus);
+      o.start(t); o.stop(t + dur + 0.1);
+      if (partial) {
+        const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+        o2.frequency.value = hz(n + 12); o2.detune.value = detune; g2.gain.value = partial;
+        o2.connect(g2); g2.connect(g); o2.start(t); o2.stop(t + dur + 0.1);
+      }
+    }
+
+    function musicStep() {
+      const t = ctx.currentTime + 0.05, s = step++;
+      if (s % 2 === 0) {
+        CHORDS[(s / 2) % CHORDS.length].forEach((n, i) =>
+          note(n, t + i * 0.09, 9.5, i ? 0.028 : 0.045, "sine", 2.2, i ? 0.4 : 0.6));
+      }
+      // More of the board found → more notes, and higher ones.
+      const most = 1 + Math.round(energy * 3) + (urgent ? 2 : 0);
+      const count = Math.floor(Math.random() * (most + 1));
+      const scale = energy > 0.6 ? PENTA.slice(3) : PENTA.slice(0, 8);
+      for (let i = 0; i < count; i++) {
+        note(pick(scale), t + 0.3 + Math.random() * 3.4, 3.2, 0.04, "triangle", 0.015);
+      }
+    }
+
+    const ready = () => on && ctx && ctx.state === "running";
+
+    return {
+      get on() { return on; },
+      // Must be called from a tap/click: browsers only allow audio after one.
+      setOn(v) {
+        on = v;
+        if (!init()) return;
+        const t = ctx.currentTime;
+        master.gain.cancelScheduledValues(t);
+        master.gain.setValueAtTime(master.gain.value, t);
+        if (on) {
+          ctx.resume();
+          master.gain.linearRampToValueAtTime(VOLUME, t + 1.5);
+          if (!timer) { musicStep(); timer = setInterval(musicStep, 4000); }
+        } else {
+          master.gain.linearRampToValueAtTime(0, t + 0.6);
+          clearInterval(timer); timer = 0;
+          setTimeout(() => { if (!on) ctx.suspend(); }, 700);
+        }
+      },
+      pause() { if (ctx && on) ctx.suspend(); },
+      resume() { if (ctx && on) ctx.resume(); },
+      setEnergy(v) { energy = v; },
+      setUrgent(v) {
+        if (v === urgent) return;
+        urgent = v;
+        if (ctx) filter.frequency.setTargetAtTime(v ? 3200 : 1700, ctx.currentTime, 0.4);
+      },
+      // A rising three-note chime; climbs a step with each word found.
+      found(i) {
+        if (!ready()) return;
+        const t = ctx.currentTime + 0.02, base = 3 + (i % 6);
+        [0, 1, 2].forEach((k) => note(PENTA[base + k], t + k * 0.08, 1.6, 0.06, "triangle", 0.005, 0.15));
+      },
+      nope() { if (ready()) { const t = ctx.currentTime + 0.02; note(50, t, 0.5, 0.06, "sine", 0.01, 0); note(49, t + 0.12, 0.6, 0.05, "sine", 0.01, 0); } },
+      tick() { if (ready()) note(96, ctx.currentTime + 0.01, 0.15, 0.03, "sine", 0.002, 0); },
+      timeUp() {
+        if (!ready()) return;
+        const t = ctx.currentTime + 0.02;
+        [69, 65, 62, 57].forEach((n, k) => note(n, t + k * 0.14, 1.4, 0.06, "triangle", 0.01, 0.2));
+      },
+      win() {
+        if (!ready()) return;
+        const t = ctx.currentTime + 0.02;
+        PENTA.forEach((n, k) => note(n, t + k * 0.07, 2.2, 0.045, "triangle", 0.005, 0.2));
+        [48, 60, 64, 67, 72].forEach((n) => note(n, t + 0.8, 6, 0.035, "sine", 0.6, 0.4));
+      },
+    };
+  })();
+
+  const boardEl = document.getElementById("board");
+  const gridEl = document.getElementById("grid");
+  const svg = document.getElementById("overlay");
+  const wordsEl = document.getElementById("words");
+  const statusEl = document.getElementById("status");
+  const themeEl = document.getElementById("theme");
+  const listDlg = document.getElementById("listDlg");
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+  let theme, grid, words, found, colorIdx, selectLine, start, current;
+
+  const shuffle = (a) => {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  // Place each word where it shares the most letters with words already on the
+  // grid (ties broken at random). Packs lots of words in, and the crossings
+  // are what make the highlights mix colours.
+  function tryPlace(g, word) {
+    let spots = [], most = 0;
+    for (const [dr, dc] of DIRS) for (let r0 = 0; r0 < SIZE; r0++) for (let c0 = 0; c0 < SIZE; c0++) {
+      const rEnd = r0 + dr * (word.length - 1);
+      const cEnd = c0 + dc * (word.length - 1);
+      if (rEnd < 0 || rEnd >= SIZE || cEnd < 0 || cEnd >= SIZE) continue;
+      let ok = true, shared = 0;
+      for (let i = 0; i < word.length; i++) {
+        const ch = g[r0 + dr * i][c0 + dc * i];
+        if (ch && ch !== word[i]) { ok = false; break; }
+        if (ch) shared++;
+      }
+      if (!ok || shared < most) continue;
+      if (shared > most) { most = shared; spots = []; }
+      spots.push([r0, c0, dr, dc]);
+    }
+    if (!spots.length) return false;
+    const [r0, c0, dr, dc] = spots[Math.floor(Math.random() * spots.length)];
+    for (let i = 0; i < word.length; i++) g[r0 + dr * i][c0 + dc * i] = word[i];
+    return true;
+  }
+
+  function generate(themeName) {
+    const want = Math.min(WORDS_PER_GAME, THEMES[themeName].length);
+    let best = null;
+    // Retry a few times so we nearly always fit the full word count.
+    for (let tries = 0; tries < 40; tries++) {
+      const shuffled = shuffle([...THEMES[themeName]]);
+      const pool = shuffled.slice(0, want).sort((a, b) => b.length - a.length);
+      const g = Array.from({ length: SIZE }, () => Array(SIZE).fill(""));
+      const placed = pool.filter((w) => tryPlace(g, w));
+      // Swap in other words from the theme for any that didn't fit.
+      for (const w of shuffled.slice(want)) {
+        if (placed.length === want) break;
+        if (tryPlace(g, w)) placed.push(w);
+      }
+      if (!best || placed.length > best.placed.length) best = { g, placed };
+      if (placed.length === want) break;
+    }
+    const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (const row of best.g) for (let c = 0; c < SIZE; c++) {
+      if (!row[c]) row[c] = A[Math.floor(Math.random() * 26)];
+    }
+    return { grid: best.g, words: best.placed.sort() };
+  }
+
+  function newGame(themeName) {
+    const names = Object.keys(THEMES);
+    theme = themeName || names[Math.floor(Math.random() * names.length)];
+    const p = generate(theme);
+    grid = p.grid;
+    words = p.words;
+    found = [];
+    colorIdx = 0;
+    themeEl.textContent = "Theme: " + theme;
+    statusEl.textContent = "Swipe across letters to find words. Tap a word below to learn about it.";
+    statusEl.className = "status";
+
+    gridEl.style.gridTemplateColumns = `repeat(${SIZE}, 1fr)`;
+    gridEl.style.gridTemplateRows = `repeat(${SIZE}, 1fr)`;
+    gridEl.innerHTML = "";
+    for (let r = 0; r < SIZE; r++) for (let c = 0; c < SIZE; c++) {
+      const d = document.createElement("div");
+      d.className = "cell";
+      d.textContent = grid[r][c];
+      gridEl.appendChild(d);
+    }
+
+    svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE}`);
+    svg.innerHTML = "";
+    selectLine = makeLine("pill-select");
+    selectLine.style.display = "none";
+
+    wordsEl.innerHTML = words.map((w) => `<li data-word="${w}">${w}</li>`).join("");
+    markNext();
+    gameId++;
+    armClock();
+    Sound.setEnergy(0);
+    watchReset();
+  }
+
+  // Music button. The setting is remembered, but browsers only allow sound to
+  // start from a tap, so a saved "on" kicks in on the first touch of the page.
+  const soundBtn = document.getElementById("sound");
+  function setSound(v) {
+    Sound.setOn(v);
+    soundBtn.setAttribute("aria-pressed", String(v));
+    try { localStorage.setItem("wordsearch-music", v ? "1" : "0"); } catch {}
+  }
+  soundBtn.addEventListener("click", () => setSound(!Sound.on));
+  let musicPref = false;
+  try { musicPref = localStorage.getItem("wordsearch-music") === "1"; } catch {}
+  if (musicPref) {
+    soundBtn.setAttribute("aria-pressed", "true");
+    const kick = (e) => {
+      document.removeEventListener("pointerdown", kick, true);
+      if (!e.target.closest || !e.target.closest("#sound")) setSound(true);
+    };
+    document.addEventListener("pointerdown", kick, true);
+  }
+  document.addEventListener("visibilitychange", () => (document.hidden ? Sound.pause() : Sound.resume()));
+
+  // ---- Crazy mode: find a word before the countdown ends, or the board resets ----
+  // The clock is "armed" on a fresh board and starts on the first touch, so you
+  // get a moment to look; each word found refills it.
+  const crazyEl = document.getElementById("crazy");
+  const secsEl = document.getElementById("crazySecs");
+  const timerEl = document.getElementById("timer");
+  const timerFill = document.getElementById("timerFill");
+  const clockEl = document.getElementById("clock");
+  let gameId = 0, deadline = null, remaining = 0, raf = 0, resetting = false;
+
+  try {
+    crazyEl.checked = localStorage.getItem("wordsearch-crazy") === "1";
+    secsEl.value = localStorage.getItem("wordsearch-crazy-secs") || "30";
+  } catch { secsEl.value = "30"; }
+
+  const totalMs = () => Number(secsEl.value) * 1000;
+  const gameOver = () => found.length === words.length;
+
+  function renderClock() {
+    boardEl.classList.toggle("crazy", crazyEl.checked);
+    if (!crazyEl.checked) { clockEl.textContent = ""; return; }
+    const urgent = remaining <= 5000 && !gameOver();
+    timerFill.style.transform = `scaleX(${Math.max(0, remaining / totalMs())})`;
+    timerEl.classList.toggle("urgent", urgent);
+    clockEl.classList.toggle("urgent", urgent);
+    clockEl.textContent = gameOver() ? "" : `⏱ ${Math.ceil(remaining / 1000)}s`;
+    // Music: brighter sound and a soft tick each second while the clock is red.
+    const running = urgent && deadline !== null;
+    Sound.setUrgent(running);
+    const sec = Math.ceil(remaining / 1000);
+    if (running && sec !== lastTick) Sound.tick();
+    lastTick = running ? sec : null;
+  }
+  let lastTick = null;
+
+  function tick() {
+    remaining = deadline - performance.now();
+    if (remaining <= 0) return timeUp();
+    renderClock();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function pauseClock() {
+    if (deadline === null) return false;
+    remaining = Math.max(0, deadline - performance.now());
+    deadline = null;
+    cancelAnimationFrame(raf);
+    return true;
+  }
+
+  function startClock() {
+    if (!crazyEl.checked || deadline !== null || gameOver() || resetting) return;
+    deadline = performance.now() + remaining;
+    tick();
+  }
+
+  function armClock() {
+    pauseClock();
+    remaining = totalMs();
+    renderClock();
+  }
+
+  function timeUp() {
+    pauseClock();
+    remaining = 0;
+    renderClock();
+    resetting = true;
+    start = current = null;
+    selectLine.style.display = "none";
+    boardEl.classList.remove("timeup");
+    void boardEl.offsetWidth; // restart the animation
+    boardEl.classList.add("timeup");
+    if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
+    statusEl.textContent = "⏰ Time's up! Starting over…";
+    Sound.setUrgent(false);
+    Sound.timeUp();
+    setTimeout(() => {
+      resetting = false;
+      boardEl.classList.remove("timeup");
+      newGame(theme);
+      statusEl.textContent = "New board — tap to start the clock.";
+    }, 1100);
+  }
+
+  crazyEl.addEventListener("change", () => {
+    try { localStorage.setItem("wordsearch-crazy", crazyEl.checked ? "1" : "0"); } catch {}
+    if (!crazyEl.checked && playModes) playModes.crazy = false;
+    armClock();
+    if (crazyEl.checked && !gameOver()) statusEl.textContent = "Crazy mode — the clock starts on your next swipe.";
+  });
+  secsEl.addEventListener("change", () => {
+    try { localStorage.setItem("wordsearch-crazy-secs", secsEl.value); } catch {}
+    armClock();
+  });
+
+  // Don't run the clock while the tab is hidden or the puzzle list is open.
+  let resumeAfter = null, watchHeld = null;
+  function suspend() {
+    if (pauseClock()) resumeAfter = gameId;
+    if (watchPause()) watchHeld = gameId;
+  }
+  function resume() {
+    // Only restart once nothing is covering the board any more.
+    if (document.hidden || document.querySelector("dialog[open]")) return;
+    if (resumeAfter === gameId) startClock();
+    if (watchHeld === gameId) playFrom = performance.now();
+    resumeAfter = watchHeld = null;
+  }
+
+  // ---- Completion records & personal bests (stored on this device) ----
+  // A stopwatch runs from the first swipe to the last word found, paused while
+  // a card or the puzzle list is open or the tab is hidden. Bests are kept per
+  // mode combination, and a mode only counts if it was on for the whole game.
+  const STATS_KEY = "wordsearch-stats";
+  let playMs = 0, playFrom = null, playModes = null;
+
+  function watchStart() {
+    if (gameOver() || resetting) return;
+    if (!playModes) playModes = { order: inOrderEl.checked, crazy: crazyEl.checked };
+    if (playFrom === null) playFrom = performance.now();
+  }
+  function watchPause() {
+    if (playFrom === null) return false;
+    playMs += performance.now() - playFrom;
+    playFrom = null;
+    return true;
+  }
+  function watchReset() { playMs = 0; playFrom = null; playModes = null; }
+
+  const MODE_NAMES = { normal: "Normal", order: "In order", crazy: "Crazy", "order+crazy": "In order + Crazy" };
+  const modeKey = (m) => [m.order && "order", m.crazy && "crazy"].filter(Boolean).join("+") || "normal";
+
+  function loadStats() {
+    try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch { return {}; }
+  }
+
+  function recordWin() {
+    watchPause();
+    const ms = Math.round(playMs), key = modeKey(playModes || { order: false, crazy: false });
+    const stats = loadStats();
+    const t = stats[theme] || (stats[theme] = { done: 0, best: {} });
+    const prev = t.best[key];
+    t.done++;
+    if (prev === undefined || ms < prev) t.best[key] = ms;
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch {}
+    return { ms, key, prev, isBest: prev === undefined || ms < prev };
+  }
+
+  function fmtTime(ms) {
+    const total = Math.round(ms / 1000), h = Math.floor(total / 3600);
+    const m = Math.floor(total / 60) % 60, sec = String(total % 60).padStart(2, "0");
+    return h ? `${h}:${String(m).padStart(2, "0")}:${sec}` : `${m}:${sec}`;
+  }
+  document.addEventListener("visibilitychange", () => (document.hidden ? suspend() : resume()));
+
+  // ---- "In order" mode: only the first unfound word (alphabetically) counts ----
+  const inOrderEl = document.getElementById("inOrder");
+  try { inOrderEl.checked = localStorage.getItem("wordsearch-in-order") === "1"; } catch {}
+  inOrderEl.addEventListener("change", () => {
+    try { localStorage.setItem("wordsearch-in-order", inOrderEl.checked ? "1" : "0"); } catch {}
+    if (!inOrderEl.checked && playModes) playModes.order = false;
+    markNext();
+  });
+
+  const nextWord = () => words.find((w) => !found.some((f) => f.word === w));
+
+  function markNext() {
+    wordsEl.querySelectorAll(".next").forEach((li) => li.classList.remove("next"));
+    const next = nextWord();
+    if (inOrderEl.checked && next) wordsEl.querySelector(`[data-word="${next}"]`).classList.add("next");
+  }
+
+  function rejectOutOfOrder(word) {
+    const chip = wordsEl.querySelector(`[data-word="${word}"]`);
+    chip.classList.remove("nope");
+    void chip.offsetWidth; // restart the shake animation
+    chip.classList.add("nope");
+    statusEl.textContent = `Not yet — find ${nextWord()} first`;
+    Sound.nope();
+    if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
+  }
+
+  function makeLine(cls) {
+    const l = document.createElementNS(SVG_NS, "line");
+    l.setAttribute("class", cls);
+    l.setAttribute("stroke-width", "0.7");
+    l.setAttribute("stroke-linecap", "round");
+    svg.appendChild(l);
+    return l;
+  }
+
+  function setLine(l, a, b) {
+    l.setAttribute("x1", a.c + 0.5); l.setAttribute("y1", a.r + 0.5);
+    l.setAttribute("x2", b.c + 0.5); l.setAttribute("y2", b.r + 0.5);
+  }
+
+  function cellAt(e) {
+    const rect = gridEl.getBoundingClientRect();
+    const c = Math.floor(((e.clientX - rect.left) / rect.width) * SIZE);
+    const r = Math.floor(((e.clientY - rect.top) / rect.height) * SIZE);
+    return {
+      r: Math.max(0, Math.min(SIZE - 1, r)),
+      c: Math.max(0, Math.min(SIZE - 1, c)),
+    };
+  }
+
+  // Snap the drag to the nearest of the 8 straight directions so a
+  // slightly wobbly finger still selects a clean line of letters.
+  function snapEnd(a, b) {
+    const dr = b.r - a.r, dc = b.c - a.c;
+    if (!dr && !dc) return { ...a };
+    const step = Math.round(Math.atan2(dr, dc) / (Math.PI / 4));
+    const sr = Math.round(Math.sin(step * Math.PI / 4));
+    const sc = Math.round(Math.cos(step * Math.PI / 4));
+    let len = Math.max(Math.abs(dr), Math.abs(dc));
+    while (len > 0) {
+      const r = a.r + sr * len, c = a.c + sc * len;
+      if (r >= 0 && r < SIZE && c >= 0 && c < SIZE) break;
+      len--;
+    }
+    return { r: a.r + sr * len, c: a.c + sc * len };
+  }
+
+  function pathBetween(a, b) {
+    const sr = Math.sign(b.r - a.r), sc = Math.sign(b.c - a.c);
+    const len = Math.max(Math.abs(b.r - a.r), Math.abs(b.c - a.c));
+    const cells = [];
+    for (let i = 0; i <= len; i++) cells.push([a.r + sr * i, a.c + sc * i]);
+    return { cells, dir: [sr, sc] };
+  }
+
+  // ---- Highlight colour rules ----
+  // Stay on the current colour until one of these forces a switch to the next:
+  //  • Rule 3: the new word shares letters with a word on the same straight
+  //    line → it must not use that word's colour.
+  //  • Rule 4: the new word crosses 2+ highlights → none of them may be its colour.
+  //  • Rule 2: each word may be overlapped by at most one word of its own colour.
+  // "Overlap" means the highlight bars touch — sharing a letter, or two
+  // diagonals crossing between letters (an X with no shared letter).
+  // Treat each bar as the segment between its end letters' centres and test
+  // whether the segments intersect. The bar width (0.7 cells) is just under
+  // the 0.707 gap between neighbouring parallel diagonals, so bars that don't
+  // intersect never visibly touch.
+  const orient = (p, q, s) => Math.sign((q.c - p.c) * (s.r - p.r) - (q.r - p.r) * (s.c - p.c));
+  const onSeg = (p, q, s) =>
+    Math.min(p.r, q.r) <= s.r && s.r <= Math.max(p.r, q.r) &&
+    Math.min(p.c, q.c) <= s.c && s.c <= Math.max(p.c, q.c);
+  function overlaps(a, b) {
+    const [p1, q1, p2, q2] = [a.from, a.to, b.from, b.to];
+    const o1 = orient(p1, q1, p2), o2 = orient(p1, q1, q2);
+    const o3 = orient(p2, q2, p1), o4 = orient(p2, q2, q1);
+    if (o1 !== o2 && o3 !== o4) return true;
+    return (o1 === 0 && onSeg(p1, q1, p2)) || (o2 === 0 && onSeg(p1, q1, q2)) ||
+           (o3 === 0 && onSeg(p2, q2, p1)) || (o4 === 0 && onSeg(p2, q2, q1));
+  }
+  const collinear = (a, b) =>
+    (a.dir[0] === b.dir[0] && a.dir[1] === b.dir[1]) ||
+    (a.dir[0] === -b.dir[0] && a.dir[1] === -b.dir[1]);
+
+  function colorAllowed(color, entry, overlapping) {
+    const sameColor = overlapping.filter((f) => f.color === color);
+    if (!sameColor.length) return true;
+    if (sameColor.some((f) => collinear(f, entry))) return false;  // rule 3
+    if (overlapping.length >= 2) return false;                     // rule 4
+    if (sameColor.length > 1) return false;                        // rule 2 (new word)
+    const other = sameColor[0];                                    // rule 2 (existing word)
+    if (found.some((f) => f !== other && f.color === color && overlaps(f, other))) return false;
+    return true;
+  }
+
+  function pickColor(entry) {
+    const overlapping = found.filter((f) => overlaps(entry, f));
+    for (let i = 0; i < COLORS.length; i++) {
+      const c = (colorIdx + i) % COLORS.length;
+      if (colorAllowed(c, entry, overlapping)) return c;
+    }
+    return colorIdx; // every colour conflicts (very unlikely) — keep the current one
+  }
+
+  boardEl.addEventListener("pointerdown", (e) => {
+    if (found.length === words.length || resetting) return;
+    e.preventDefault();
+    startClock();
+    watchStart();
+    boardEl.setPointerCapture(e.pointerId);
+    start = cellAt(e);
+    current = start;
+    setLine(selectLine, start, current);
+    selectLine.style.display = "";
+  });
+
+  boardEl.addEventListener("pointermove", (e) => {
+    if (!start) return;
+    current = snapEnd(start, cellAt(e));
+    setLine(selectLine, start, current);
+  });
+
+  function endSelection() {
+    if (!start) return;
+    const { cells, dir } = pathBetween(start, current);
+    const s = cells.map(([r, c]) => grid[r][c]).join("");
+    const rev = [...s].reverse().join("");
+    const match = words.find((w) => !found.some((f) => f.word === w) && (w === s || w === rev));
+    if (match && inOrderEl.checked && match !== nextWord()) {
+      rejectOutOfOrder(match);
+    } else if (match) {
+      const entry = { word: match, from: { ...start }, to: { ...current }, dir };
+      entry.color = colorIdx = pickColor(entry);
+      found.push(entry);
+
+      const hex = COLORS[entry.color].hex;
+      const l = makeLine("pill-found");
+      l.setAttribute("stroke", hex);
+      l.dataset.word = match;
+      l.dataset.color = COLORS[entry.color].name;
+      setLine(l, start, current);
+      svg.insertBefore(l, selectLine);
+
+      const chip = wordsEl.querySelector(`[data-word="${match}"]`);
+      chip.classList.add("found");
+      chip.style.background = hex;
+      markNext();
+      // Crazy mode: a found word refills the clock.
+      if (pauseClock()) { remaining = totalMs(); startClock(); }
+      renderClock();
+
+      if (navigator.vibrate) navigator.vibrate(30);
+      Sound.setEnergy(found.length / words.length);
+      if (found.length === words.length) {
+        const r = recordWin(), mode = r.key === "normal" ? "" : ` (${MODE_NAMES[r.key]})`;
+        statusEl.textContent = r.isBest
+          ? `🎉 Done in ${fmtTime(r.ms)}${mode} — ${r.prev === undefined ? "first finish" : "new personal best"}!`
+          : `🎉 Done in ${fmtTime(r.ms)}${mode} · best ${fmtTime(r.prev)}`;
+        statusEl.className = "status win";
+        Sound.win();
+      } else {
+        Sound.found(found.length - 1);
+        statusEl.textContent = `${found.length} of ${words.length} found`;
+      }
+    }
+    selectLine.style.display = "none";
+    start = current = null;
+  }
+
+  boardEl.addEventListener("pointerup", endSelection);
+  boardEl.addEventListener("pointercancel", endSelection);
+  document.getElementById("newGame").addEventListener("click", () => newGame());
+
+  // ---- Puzzle list ----
+  function renderList() {
+    const stats = loadStats();
+    document.getElementById("puzzleList").innerHTML = Object.entries(THEMES).sort(([a], [b]) => a.localeCompare(b)).map(([name, list]) => {
+      const st = stats[name];
+      const bests = st ? Object.keys(MODE_NAMES).filter((k) => st.best[k] !== undefined)
+        .map((k) => `<span><b>${fmtTime(st.best[k])}</b> ${MODE_NAMES[k]}</span>`).join("") : "";
+      return `
+      <li class="puzzle${name === theme ? " current" : ""}${st ? " done" : ""}">
+        <div class="puzzle-top">
+          <h3>${name} <span class="count">· ${list.length} words</span></h3>
+          <button data-theme="${name}">${name === theme ? "Replay" : "Play"}</button>
+        </div>
+        ${st ? `<div class="record"><span class="tick">✓ Completed${st.done > 1 ? ` ×${st.done}` : ""}</span>${bests ? `<span class="bests">Best: ${bests}</span>` : ""}</div>` : ""}
+        <p>${[...list].sort().join(" · ")}</p>
+      </li>`;
+    }).join("");
+  }
+  document.getElementById("openList").addEventListener("click", () => { suspend(); renderList(); listDlg.showModal(); });
+  listDlg.addEventListener("close", resume);
+
+  // ---- Word info card: tap any word chip to read about it ----
+  const infoDlg = document.getElementById("infoDlg");
+  wordsEl.addEventListener("click", (e) => {
+    const li = e.target.closest("li[data-word]");
+    if (!li) return;
+    const word = li.dataset.word;
+    const info = (window.WORD_INFO && WORD_INFO[theme] && WORD_INFO[theme][word]) || "";
+    const f = found.find((x) => x.word === word);
+    document.getElementById("infoTheme").textContent = theme;
+    document.getElementById("infoWord").textContent = word;
+    document.getElementById("infoText").textContent = info || "No description yet for this word.";
+    document.getElementById("infoBand").style.background = f ? COLORS[f.color].hex : "";
+    suspend();   // crazy-mode clock waits while you read
+    infoDlg.showModal();
+  });
+  document.getElementById("infoClose").addEventListener("click", () => infoDlg.close());
+  infoDlg.addEventListener("click", (e) => { if (e.target === infoDlg) infoDlg.close(); });
+  infoDlg.addEventListener("close", resume);
+  document.getElementById("closeList").addEventListener("click", () => listDlg.close());
+  listDlg.addEventListener("click", (e) => {
+    if (e.target === listDlg) return listDlg.close();   // tap on backdrop
+    const t = e.target.closest("button[data-theme]");
+    if (t) { newGame(t.dataset.theme); listDlg.close(); }
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>
